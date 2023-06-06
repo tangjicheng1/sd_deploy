@@ -151,6 +151,9 @@ def get_closet_checkpoint_match(search_string):
 def model_hash(filename):
     """old hash that only looks at a small part of the file and is prone to collisions"""
 
+    import uuid
+    return str(uuid.uuid4().hex)
+
     try:
         with open(filename, "rb") as file:
             import hashlib
