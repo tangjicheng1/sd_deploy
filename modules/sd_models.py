@@ -19,6 +19,8 @@ from modules.sd_hijack_inpainting import do_inpainting_hijack
 from modules.timer import Timer
 import tomesd
 
+import time
+
 model_dir = "Stable-diffusion"
 model_path = os.path.abspath(os.path.join(paths.models_path, model_dir))
 
@@ -287,8 +289,11 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
     if state_dict is None:
         state_dict = get_checkpoint_state_dict(checkpoint_info, timer)
 
+    print(f"[{time.time()}] before model.load_state_dict")
     model.load_state_dict(state_dict, strict=False)
+    print(f"[{time.time()}] after model.load_state_dict")
     del state_dict
+    print(f"[{time.time()}] after del state_dict")
     timer.record("apply weights to model")
 
     if shared.opts.sd_checkpoint_cache > 0:
