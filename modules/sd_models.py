@@ -249,8 +249,9 @@ def read_metadata_from_safetensors(filename):
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
-        device = map_location or shared.weight_load_location or devices.get_optimal_device_name()
-        pl_sd = safetensors.torch.load_file(checkpoint_file, device=device)
+        with open(checkpoint_file, "rb") as file:
+            model_data = file.read()
+        pl_sd = safetensors.torch.load(model_data)
     else:
         pl_sd = torch.load(checkpoint_file, map_location=map_location or shared.weight_load_location)
 
