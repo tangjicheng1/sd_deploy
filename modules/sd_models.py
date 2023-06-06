@@ -56,12 +56,12 @@ class CheckpointInfo:
 
         self.metadata = {}
 
-        _, ext = os.path.splitext(self.filename)
-        if ext.lower() == ".safetensors":
-            try:
-                self.metadata = read_metadata_from_safetensors(filename)
-            except Exception as e:
-                errors.display(e, f"reading checkpoint metadata: {filename}")
+        # _, ext = os.path.splitext(self.filename)
+        # if ext.lower() == ".safetensors":
+        #     try:
+        #         self.metadata = read_metadata_from_safetensors(filename)
+        #     except Exception as e:
+        #         errors.display(e, f"reading checkpoint metadata: {filename}")
 
     def register(self):
         checkpoints_list[self.title] = self
