@@ -85,8 +85,6 @@ def sha256(filename, title, use_addnet_hash=False):
         "sha256": sha256_value,
     }
 
-    # dump_cache()
-
     return sha256_value
 
 

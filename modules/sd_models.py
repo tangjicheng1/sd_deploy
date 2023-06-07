@@ -3,6 +3,7 @@ import os.path
 import sys
 import gc
 import threading
+import uuid
 
 import torch
 import re
@@ -18,8 +19,6 @@ from modules import paths, shared, modelloader, devices, script_callbacks, sd_va
 from modules.sd_hijack_inpainting import do_inpainting_hijack
 from modules.timer import Timer
 import tomesd
-
-import time
 
 model_dir = "Stable-diffusion"
 model_path = os.path.abspath(os.path.join(paths.models_path, model_dir))
@@ -146,19 +145,7 @@ def get_closet_checkpoint_match(search_string):
 def model_hash(filename):
     """old hash that only looks at a small part of the file and is prone to collisions"""
 
-    import uuid
     return str(uuid.uuid4().hex)
-
-    try:
-        with open(filename, "rb") as file:
-            import hashlib
-            m = hashlib.sha256()
-
-            file.seek(0x100000)
-            m.update(file.read(0x10000))
-            return m.hexdigest()[0:8]
-    except FileNotFoundError:
-        return 'NOFILE'
 
 
 def select_checkpoint():
@@ -240,15 +227,11 @@ def read_metadata_from_safetensors(filename):
 
         return res
 
-import gc
-import io
-
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
-        file =  open(checkpoint_file, "rb", buffering=20*1024*1024)
-        model_data = file.read()
-        file.close()
+        with open(checkpoint_file, "rb", buffering=20*1024*1024) as file:
+            model_data = file.read()
         pl_sd = safetensors.torch.load(model_data)
         del model_data
         gc.collect()
@@ -271,7 +254,6 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
         print(f"Loading weights [{sd_model_hash}] from cache")
         return checkpoints_loaded[checkpoint_info]
 
-    timer.record("mid in get_checkpoint_state_dict")
     print(f"Loading weights [{sd_model_hash}] from {checkpoint_info.filename}")
     res = read_state_dict(checkpoint_info.filename)
     timer.record("load weights from disk")
@@ -288,11 +270,9 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
     if state_dict is None:
         state_dict = get_checkpoint_state_dict(checkpoint_info, timer)
 
-    print(f"[{time.time()}] before model.load_state_dict")
     model.load_state_dict(state_dict, strict=False)
-    print(f"[{time.time()}] after model.load_state_dict")
     del state_dict
-    print(f"[{time.time()}] after del state_dict")
+    gc.collect()
     timer.record("apply weights to model")
 
     if shared.opts.sd_checkpoint_cache > 0:
