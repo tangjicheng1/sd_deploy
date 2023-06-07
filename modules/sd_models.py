@@ -248,12 +248,13 @@ def read_metadata_from_safetensors(filename):
         return res
 
 import gc
+import io
 
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
-        print(f"[{time.time()}] before open")
-        file =  open(checkpoint_file, "rb")
+        print(f"[{time.time()}] before open, io.DEFAULT_BUFFER_SIZE: {io.DEFAULT_BUFFER_SIZE}")
+        file =  open(checkpoint_file, "rb", buffering=4096)
         print(f"[{time.time()}] after open")
         model_data = file.read()
         print(f"[{time.time()}] after read")
