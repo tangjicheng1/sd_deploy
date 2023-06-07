@@ -78,11 +78,6 @@ def sha256(filename, title, use_addnet_hash=False):
 
     print(f"Calculating sha256 for {filename}: ", end='')
     sha256_value = get_uuid()
-    # if use_addnet_hash:
-    #     with open(filename, "rb") as file:
-    #         sha256_value = addnet_hash_safetensors(file)
-    # else:
-    #     sha256_value = calculate_sha256(filename)
     print(f"{sha256_value}")
 
     hashes[title] = {

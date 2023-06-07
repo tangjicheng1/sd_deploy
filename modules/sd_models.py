@@ -58,13 +58,6 @@ class CheckpointInfo:
 
         self.metadata = {}
 
-        # _, ext = os.path.splitext(self.filename)
-        # if ext.lower() == ".safetensors":
-        #     try:
-        #         self.metadata = read_metadata_from_safetensors(filename)
-        #     except Exception as e:
-        #         errors.display(e, f"reading checkpoint metadata: {filename}")
-
     def register(self):
         checkpoints_list[self.title] = self
         for id in self.ids:
@@ -253,13 +246,9 @@ import io
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
-        print(f"[{time.time()}] before open, io.DEFAULT_BUFFER_SIZE: {io.DEFAULT_BUFFER_SIZE}")
-        file =  open(checkpoint_file, "rb", buffering=1048576)
-        print(f"[{time.time()}] after open")
+        file =  open(checkpoint_file, "rb", buffering=20*1024*1024)
         model_data = file.read()
-        print(f"[{time.time()}] after read")
         file.close()
-        print(f"[{time.time()}] after close")
         pl_sd = safetensors.torch.load(model_data)
         del model_data
         gc.collect()
