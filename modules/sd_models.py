@@ -251,8 +251,10 @@ def read_metadata_from_safetensors(filename):
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
+        print(f"[{time.time()}] before open")
         with open(checkpoint_file, "rb") as file:
             model_data = file.read()
+        print(f"[{time.time()}] after open")
         pl_sd = safetensors.torch.load(model_data)
     else:
         pl_sd = torch.load(checkpoint_file, map_location=map_location or shared.weight_load_location)
@@ -266,13 +268,14 @@ def read_state_dict(checkpoint_file, print_global_state=False, map_location=None
 
 def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calculate hash in get_checkpoint_state_dict")
 
     if checkpoint_info in checkpoints_loaded:
         # use checkpoint cache
         print(f"Loading weights [{sd_model_hash}] from cache")
         return checkpoints_loaded[checkpoint_info]
 
+    timer.record("mid in get_checkpoint_state_dict")
     print(f"Loading weights [{sd_model_hash}] from {checkpoint_info.filename}")
     res = read_state_dict(checkpoint_info.filename)
     timer.record("load weights from disk")
@@ -282,7 +285,7 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
 
 def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calculate hash in load_model_weight")
 
     shared.opts.data["sd_model_checkpoint"] = checkpoint_info.title
 
