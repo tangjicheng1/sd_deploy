@@ -247,15 +247,21 @@ def read_metadata_from_safetensors(filename):
 
         return res
 
+import gc
 
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
         print(f"[{time.time()}] before open")
-        with open(checkpoint_file, "rb") as file:
-            model_data = file.read()
+        file =  open(checkpoint_file, "rb")
         print(f"[{time.time()}] after open")
+        model_data = file.read()
+        print(f"[{time.time()}] after read")
+        file.close()
+        print(f"[{time.time()}] after close")
         pl_sd = safetensors.torch.load(model_data)
+        del model_data
+        gc.collect()
     else:
         pl_sd = torch.load(checkpoint_file, map_location=map_location or shared.weight_load_location)
 
