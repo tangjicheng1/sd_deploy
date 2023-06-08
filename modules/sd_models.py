@@ -3,7 +3,7 @@ import os.path
 import sys
 import gc
 import threading
-import uuid
+import hashlib
 
 import torch
 import re
@@ -144,8 +144,10 @@ def get_closet_checkpoint_match(search_string):
 
 def model_hash(filename):
     """old hash that only looks at a small part of the file and is prone to collisions"""
-
-    return str(uuid.uuid4().hex)
+    filename_str = os.path.basename(filename)
+    hash_object = hashlib.md5()
+    hash_object.update(filename_str.encode('utf-8'))
+    return hash_object.hexdigest()
 
 
 def select_checkpoint():

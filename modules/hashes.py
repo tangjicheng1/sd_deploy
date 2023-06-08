@@ -7,11 +7,6 @@ import filelock
 from modules import shared
 from modules.paths import data_path
 
-import uuid
-
-def get_uuid():
-    return str(uuid.uuid4().hex)
-
 cache_filename = os.path.join(data_path, "cache.json")
 cache_data = None
 
@@ -77,7 +72,10 @@ def sha256(filename, title, use_addnet_hash=False):
         return None
 
     print(f"Calculating sha256 for {filename}: ", end='')
-    sha256_value = get_uuid()
+    filename_str = os.path.basename(filename)
+    hash_object = hashlib.md5()
+    hash_object.update(filename_str.encode('utf-8'))
+    sha256_value = hash_object.hexdigest()
     print(f"{sha256_value}")
 
     hashes[title] = {
