@@ -7,7 +7,6 @@ import filelock
 from modules import shared
 from modules.paths import data_path
 
-
 cache_filename = os.path.join(data_path, "cache.json")
 cache_data = None
 
@@ -73,19 +72,16 @@ def sha256(filename, title, use_addnet_hash=False):
         return None
 
     print(f"Calculating sha256 for {filename}: ", end='')
-    if use_addnet_hash:
-        with open(filename, "rb") as file:
-            sha256_value = addnet_hash_safetensors(file)
-    else:
-        sha256_value = calculate_sha256(filename)
+    filename_str = os.path.basename(filename)
+    hash_object = hashlib.md5()
+    hash_object.update(filename_str.encode('utf-8'))
+    sha256_value = hash_object.hexdigest()
     print(f"{sha256_value}")
 
     hashes[title] = {
         "mtime": os.path.getmtime(filename),
         "sha256": sha256_value,
     }
-
-    dump_cache()
 
     return sha256_value
 

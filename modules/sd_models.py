@@ -3,6 +3,7 @@ import os.path
 import sys
 import gc
 import threading
+import hashlib
 
 import torch
 import re
@@ -55,13 +56,6 @@ class CheckpointInfo:
         self.ids = [self.hash, self.model_name, self.title, name, f'{name} [{self.hash}]'] + ([self.shorthash, self.sha256, f'{self.name} [{self.shorthash}]'] if self.shorthash else [])
 
         self.metadata = {}
-
-        _, ext = os.path.splitext(self.filename)
-        if ext.lower() == ".safetensors":
-            try:
-                self.metadata = read_metadata_from_safetensors(filename)
-            except Exception as e:
-                errors.display(e, f"reading checkpoint metadata: {filename}")
 
     def register(self):
         checkpoints_list[self.title] = self
@@ -150,17 +144,10 @@ def get_closet_checkpoint_match(search_string):
 
 def model_hash(filename):
     """old hash that only looks at a small part of the file and is prone to collisions"""
-
-    try:
-        with open(filename, "rb") as file:
-            import hashlib
-            m = hashlib.sha256()
-
-            file.seek(0x100000)
-            m.update(file.read(0x10000))
-            return m.hexdigest()[0:8]
-    except FileNotFoundError:
-        return 'NOFILE'
+    filename_str = os.path.basename(filename)
+    hash_object = hashlib.md5()
+    hash_object.update(filename_str.encode('utf-8'))
+    return hash_object.hexdigest()
 
 
 def select_checkpoint():
@@ -242,12 +229,14 @@ def read_metadata_from_safetensors(filename):
 
         return res
 
-
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
-        device = map_location or shared.weight_load_location or devices.get_optimal_device_name()
-        pl_sd = safetensors.torch.load_file(checkpoint_file, device=device)
+        with open(checkpoint_file, "rb", buffering=20*1024*1024) as file:
+            model_data = file.read()
+        pl_sd = safetensors.torch.load(model_data)
+        del model_data
+        gc.collect()
     else:
         pl_sd = torch.load(checkpoint_file, map_location=map_location or shared.weight_load_location)
 
@@ -260,7 +249,7 @@ def read_state_dict(checkpoint_file, print_global_state=False, map_location=None
 
 def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calculate hash in get_checkpoint_state_dict")
 
     if checkpoint_info in checkpoints_loaded:
         # use checkpoint cache
@@ -276,7 +265,7 @@ def get_checkpoint_state_dict(checkpoint_info: CheckpointInfo, timer):
 
 def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer):
     sd_model_hash = checkpoint_info.calculate_shorthash()
-    timer.record("calculate hash")
+    timer.record("calculate hash in load_model_weight")
 
     shared.opts.data["sd_model_checkpoint"] = checkpoint_info.title
 
@@ -285,6 +274,7 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
 
     model.load_state_dict(state_dict, strict=False)
     del state_dict
+    gc.collect()
     timer.record("apply weights to model")
 
     if shared.opts.sd_checkpoint_cache > 0:
