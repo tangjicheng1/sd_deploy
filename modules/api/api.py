@@ -30,6 +30,7 @@ from typing import Dict, List, Any
 import piexif
 import piexif.helper
 
+from modules.api import api_log
 
 def upscaler_to_index(name: str):
     try:
@@ -294,6 +295,7 @@ class Api:
         return script_args
 
     def text2imgapi(self, txt2imgreq: models.StableDiffusionTxt2ImgProcessingAPI):
+        print(f"{api_log.get_log_head()} called text2imgapi")
         script_runner = scripts.scripts_txt2img
         if not script_runner.scripts:
             script_runner.initialize_scripts(False)
@@ -340,6 +342,7 @@ class Api:
         return models.TextToImageResponse(images=b64images, parameters=vars(txt2imgreq), info=processed.js())
 
     def img2imgapi(self, img2imgreq: models.StableDiffusionImg2ImgProcessingAPI):
+        print(f"{api_log.get_log_head()} called img2imgapi")
         init_images = img2imgreq.init_images
         if init_images is None:
             raise HTTPException(status_code=404, detail="Init image not found")
@@ -401,6 +404,7 @@ class Api:
         return models.ImageToImageResponse(images=b64images, parameters=vars(img2imgreq), info=processed.js())
 
     def extras_single_image_api(self, req: models.ExtrasSingleImageRequest):
+        print(f"{api_log.get_log_head()} called extras_single_image_api")
         reqDict = setUpscalers(req)
 
         reqDict['image'] = decode_base64_to_image(reqDict['image'])
@@ -411,6 +415,7 @@ class Api:
         return models.ExtrasSingleImageResponse(image=encode_pil_to_base64(result[0][0]), html_info=result[1])
 
     def extras_batch_images_api(self, req: models.ExtrasBatchImagesRequest):
+        print(f"{api_log.get_log_head()} called extras_batch_images_api")
         reqDict = setUpscalers(req)
 
         image_list = reqDict.pop('imageList', [])
@@ -422,6 +427,7 @@ class Api:
         return models.ExtrasBatchImagesResponse(images=list(map(encode_pil_to_base64, result[0])), html_info=result[1])
 
     def pnginfoapi(self, req: models.PNGInfoRequest):
+        print(f"{api_log.get_log_head()} called pnginfoapi")
         if(not req.image.strip()):
             return models.PNGInfoResponse(info="")
 
@@ -438,6 +444,7 @@ class Api:
         return models.PNGInfoResponse(info=geninfo, items=items)
 
     def progressapi(self, req: models.ProgressRequest = Depends()):
+        print(f"{api_log.get_log_head()} called progressapi")
         # copy from check_progress_call of ui.py
 
         if shared.state.job_count == 0:
@@ -466,6 +473,7 @@ class Api:
         return models.ProgressResponse(progress=progress, eta_relative=eta_relative, state=shared.state.dict(), current_image=current_image, textinfo=shared.state.textinfo)
 
     def interrogateapi(self, interrogatereq: models.InterrogateRequest):
+        print(f"{api_log.get_log_head()} called interrogateapi")
         image_b64 = interrogatereq.image
         if image_b64 is None:
             raise HTTPException(status_code=404, detail="Image not found")
@@ -485,24 +493,29 @@ class Api:
         return models.InterrogateResponse(caption=processed)
 
     def interruptapi(self):
+        print(f"{api_log.get_log_head()} called interruptapi")
         shared.state.interrupt()
 
         return {}
 
     def unloadapi(self):
+        print(f"{api_log.get_log_head()} called unloadapi")
         unload_model_weights()
 
         return {}
 
     def reloadapi(self):
+        print(f"{api_log.get_log_head()} called reloadapi")
         reload_model_weights()
 
         return {}
 
     def skip(self):
+        print(f"{api_log.get_log_head()} called skip")
         shared.state.skip()
 
     def get_config(self):
+        print(f"{api_log.get_log_head()} called get_config")
         options = {}
         for key in shared.opts.data.keys():
             metadata = shared.opts.data_labels.get(key)
@@ -514,6 +527,7 @@ class Api:
         return options
 
     def set_config(self, req: Dict[str, Any]):
+        print(f"{api_log.get_log_head()} called set_config")
         for k, v in req.items():
             shared.opts.set(k, v)
 
@@ -521,12 +535,15 @@ class Api:
         return
 
     def get_cmd_flags(self):
+        print(f"{api_log.get_log_head()} called get_cmd_flags")
         return vars(shared.cmd_opts)
 
     def get_samplers(self):
+        print(f"{api_log.get_log_head()} called get_samplers")
         return [{"name": sampler[0], "aliases":sampler[2], "options":sampler[3]} for sampler in sd_samplers.all_samplers]
 
     def get_upscalers(self):
+        print(f"{api_log.get_log_head()} called get_upscalers")
         return [
             {
                 "name": upscaler.name,
@@ -539,18 +556,23 @@ class Api:
         ]
 
     def get_sd_models(self):
+        print(f"{api_log.get_log_head()} called get_sd_models")
         return [{"title": x.title, "model_name": x.model_name, "hash": x.shorthash, "sha256": x.sha256, "filename": x.filename, "config": find_checkpoint_config_near_filename(x)} for x in checkpoints_list.values()]
 
     def get_hypernetworks(self):
+        print(f"{api_log.get_log_head()} called get_hypernetworks")
         return [{"name": name, "path": shared.hypernetworks[name]} for name in shared.hypernetworks]
 
     def get_face_restorers(self):
+        print(f"{api_log.get_log_head()} called get_face_restorers")
         return [{"name":x.name(), "cmd_dir": getattr(x, "cmd_dir", None)} for x in shared.face_restorers]
 
     def get_realesrgan_models(self):
+        print(f"{api_log.get_log_head()} called get_realesrgan_models")
         return [{"name":x.name,"path":x.data_path, "scale":x.scale} for x in get_realesrgan_models(None)]
 
     def get_prompt_styles(self):
+        print(f"{api_log.get_log_head()} called get_prompt_styles")
         styleList = []
         for k in shared.prompt_styles.styles:
             style = shared.prompt_styles.styles[k]
@@ -559,6 +581,7 @@ class Api:
         return styleList
 
     def get_embeddings(self):
+        print(f"{api_log.get_log_head()} called get_embeddings")
         db = sd_hijack.model_hijack.embedding_db
 
         def convert_embedding(embedding):
@@ -579,9 +602,11 @@ class Api:
         }
 
     def refresh_checkpoints(self):
+        print(f"{api_log.get_log_head()} called refresh_checkpoints")
         shared.refresh_checkpoints()
 
     def create_embedding(self, args: dict):
+        print(f"{api_log.get_log_head()} called create_embedding")
         try:
             shared.state.begin()
             filename = create_embedding(**args) # create empty embedding
@@ -593,6 +618,7 @@ class Api:
             return models.TrainResponse(info=f"create embedding error: {e}")
 
     def create_hypernetwork(self, args: dict):
+        print(f"{api_log.get_log_head()} called create_hypernetwork")
         try:
             shared.state.begin()
             filename = create_hypernetwork(**args) # create empty embedding
@@ -603,6 +629,7 @@ class Api:
             return models.TrainResponse(info=f"create hypernetwork error: {e}")
 
     def preprocess(self, args: dict):
+        print(f"{api_log.get_log_head()} called preprocess")
         try:
             shared.state.begin()
             preprocess(**args) # quick operation unless blip/booru interrogation is enabled
@@ -619,6 +646,7 @@ class Api:
             return models.PreprocessResponse(info=f'preprocess error: {e}')
 
     def train_embedding(self, args: dict):
+        print(f"{api_log.get_log_head()} called train_embedding")
         try:
             shared.state.begin()
             apply_optimizations = shared.opts.training_xattention_optimizations
@@ -640,6 +668,7 @@ class Api:
             return models.TrainResponse(info=f"train embedding error: {msg}")
 
     def train_hypernetwork(self, args: dict):
+        print(f"{api_log.get_log_head()} called train_hypernetwork")
         try:
             shared.state.begin()
             shared.loaded_hypernetworks = []
@@ -664,6 +693,7 @@ class Api:
             return models.TrainResponse(info=f"train embedding error: {error}")
 
     def get_memory(self):
+        print(f"{api_log.get_log_head()} called get_memory")
         try:
             import os
             import psutil
@@ -699,5 +729,6 @@ class Api:
         return models.MemoryResponse(ram=ram, cuda=cuda)
 
     def launch(self, server_name, port):
+        print(f"{api_log.get_log_head()} called launch")
         self.app.include_router(self.router)
         uvicorn.run(self.app, host=server_name, port=port)

@@ -4,7 +4,7 @@ import sys
 import gc
 import threading
 import hashlib
-
+import time
 import torch
 import re
 import safetensors.torch
@@ -18,6 +18,7 @@ from ldm.util import instantiate_from_config
 from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config
 from modules.sd_hijack_inpainting import do_inpainting_hijack
 from modules.timer import Timer
+from modules.api import api_log
 import tomesd
 
 model_dir = "Stable-diffusion"
@@ -232,14 +233,16 @@ def read_metadata_from_safetensors(filename):
 def read_state_dict(checkpoint_file, print_global_state=False, map_location=None):
     _, extension = os.path.splitext(checkpoint_file)
     if extension.lower() == ".safetensors":
+        start_time = time.time()
         with open(checkpoint_file, "rb", buffering=20*1024*1024) as file:
             model_data = file.read()
+        end_time = time.time()
+        print(f"{api_log.get_log_head()} load [{os.path.basename(checkpoint_file)}] cost: {end_time - start_time} s")
         pl_sd = safetensors.torch.load(model_data)
         del model_data
         gc.collect()
     else:
         pl_sd = torch.load(checkpoint_file, map_location=map_location or shared.weight_load_location)
-
     if print_global_state and "global_step" in pl_sd:
         print(f"Global Step: {pl_sd['global_step']}")
 
@@ -269,12 +272,17 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
 
     shared.opts.data["sd_model_checkpoint"] = checkpoint_info.title
 
+    start_time0 = time.time()
     if state_dict is None:
         state_dict = get_checkpoint_state_dict(checkpoint_info, timer)
 
+    start_time1 = time.time()
     model.load_state_dict(state_dict, strict=False)
+    start_time2 = time.time()
     del state_dict
     gc.collect()
+    start_time3 = time.time()
+    print(f"{api_log.get_log_head()} in load_model_weights, title[{checkpoint_info.title}] cost1:{start_time1-start_time0}, cost2:{start_time2-start_time1}, cost3:{start_time3-start_time2}")
     timer.record("apply weights to model")
 
     if shared.opts.sd_checkpoint_cache > 0:
