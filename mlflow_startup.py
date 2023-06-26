@@ -12,7 +12,6 @@ class StableDiffusion(mlflow.pyfunc.PythonModel):
     self.webui_wrapper.initialize()
 
   def predict(self, context, input):
-    print(f"[tangjicheng] {type(input['model_input'][0])}")
     output = self.webui_wrapper.txt2img(input['model_name'][0], input['model_input'][0])
     return output
 
@@ -87,68 +86,16 @@ with mlflow.start_run() as run:
         signature=signature
     )
 
-# COMMAND ----------
-
 # Register model in MLflow Model Registry
 result = mlflow.register_model(
     "runs:/"+run.info.run_id+"/model",
     "stable-diffusion-webui-1"
 )
-# Note: Due to the large size of the model, the registration process might take longer than the default maximum wait time of 300 seconds. MLflow could throw an exception indicating that the max wait time has been exceeded. Don't worry if this happens - it's not necessarily an error. Instead, you can confirm the registration status of the model by directly checking the model registry. This exception is merely a time-out notification and does not necessarily imply a failure in the registration process.
-
-# COMMAND ----------
 
 # Load the logged model
 loaded_model = mlflow.pyfunc.load_model('runs:/'+run.info.run_id+'/model')
 
-# COMMAND ----------
-
 # Make a prediction using the loaded model
-
-
-result_image_np = loaded_model.predict(input_example)
-
-pic = decode_base64_to_image(result_image_np)
+result_image = loaded_model.predict(input_example)
+pic = decode_base64_to_image(result_image)
 pic.save("mlflow_1.jpg")
-
-# COMMAND ----------
-
-# plot the resulting image
-# import matplotlib.pyplot as plt
-# plt.imshow(result_image_np)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Make API request to Model Serving Endpoint
-
-# COMMAND ----------
-
-# import os
-# import requests
-# import pandas as pd
-# import json
-# import matplotlib.pyplot as plt
-
-# # define parameters at the start
-# URL = ""
-# DATABRICKS_TOKEN = ""
-# INPUT_EXAMPLE = pd.DataFrame({"prompt":["a photo of an astronaut riding a horse on water"]})
-
-# def score_model(dataset, url=URL, databricks_token=DATABRICKS_TOKEN):
-#     headers = {'Authorization': f'Bearer {databricks_token}', 
-#                'Content-Type': 'application/json'}
-#     ds_dict = {'dataframe_split': dataset.to_dict(orient='split')}
-#     data_json = json.dumps(ds_dict, allow_nan=True)
-#     response = requests.request(method='POST', headers=headers, url=url, data=data_json)
-#     if response.status_code != 200:
-#         raise Exception(f'Request failed with status {response.status_code}, {response.text}')
-
-#     return response.json()
-
-# # scoring the model
-# t = score_model(INPUT_EXAMPLE)
-
-# # visualizing the predictions
-# plt.imshow(t['predictions'])
-# plt.show()
