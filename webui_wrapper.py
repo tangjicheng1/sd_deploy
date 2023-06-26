@@ -4,6 +4,7 @@ from modules.api import api
 import base64
 import io
 import time
+import json
 import datetime
 import uvicorn
 from threading import Lock
@@ -640,66 +641,72 @@ class StableDiffusionWebuiWrapper:
     def initialize(self):
         webui.initialize()
 
-    def txt2img(self, model_name: str, txt2imgreq: models.StableDiffusionTxt2ImgProcessingAPI) -> models.TextToImageResponse:
+    def txt2img(self, model_name: str, model_input: str) -> str:
+        model_input = json.loads(model_input)
+        txt2imgreq = models.StableDiffusionTxt2ImgProcessingAPI(**model_input)
         self.api.refresh_checkpoints()
         selected_model = {"sd_model_checkpoint" : model_name}
         self.api.set_config(selected_model)
-        return self.api.text2imgapi(txt2imgreq)
+        output = self.api.text2imgapi(txt2imgreq)
+        image = output.images[0]
+        return image
 
 if __name__ == "__main__":
     print("start testing for StableDiffusionWebuiWrapper ...")
     webui = StableDiffusionWebuiWrapper()
     # print(f"type: {type(models.StableDiffusionTxt2ImgProcessingAPI)}")
-    input = models.StableDiffusionTxt2ImgProcessingAPI(
-        enable_hr = False,
-        denoising_strength = 0.5,
-        firstphase_width = 0,
-        firstphase_height = 0,
-        hr_scale = 2,
-        hr_upscaler = "string",
-        hr_second_pass_steps = 0,
-        hr_resize_x = 0,
-        hr_resize_y = 0,
-        hr_sampler_name = "string",
-        hr_prompt = "",
-        hr_negative_prompt = "",
-        prompt = "1girl",
-        styles = [
-             "string"
-         ],
-        seed = 123,
-        subseed = 123,
-        subseed_strength = 0,
-        seed_resize_from_h = -1,
-        seed_resize_from_w = -1,
-        sampler_name = "LMS",
-        batch_size = 1,
-        n_iter = 1,
-        steps = 20,
-        cfg_scale = 7,
-        width = 512,
-        height = 512,
-        restore_faces = False,
-        tiling = False,
-        do_not_save_samples = False,
-        do_not_save_grid = False,
-        negative_prompt = "",
-        eta = 0,
-        s_min_uncond = 0,
-        s_churn = 0,
-        s_tmax = 0,
-        s_tmin = 0,
-        s_noise = 1,
-        override_settings = {},
-        override_settings_restore_afterwards = True,
-        script_args = [],
-        sampler_index = "Euler",
-        script_name = "",
-        send_images = True,
-        save_images = False,
-        alwayson_scripts = {}
-    )
-    output = webui.txt2img("MeinaMix.safetensors", input)
-    image = output.images[0]
+
+    input2='''{
+                    "model_name": "MeinaMix.safetensors",
+                    "enable_hr": false,
+                    "denoising_strength": 0.5,
+                    "firstphase_width": 0,
+                    "firstphase_height": 0,
+                    "hr_scale": 2,
+                    "hr_upscaler": "string",
+                    "hr_second_pass_steps": 0,
+                    "hr_resize_x": 0,
+                    "hr_resize_y": 0,
+                    "hr_sampler_name": "string",
+                    "hr_prompt": "",
+                    "hr_negative_prompt": "",
+                    "prompt": "1girl",
+                    "styles": [
+                        "string"
+                    ],
+                    "seed": 123,
+                    "subseed": 123,
+                    "subseed_strength": 0,
+                    "seed_resize_from_h": -1,
+                    "seed_resize_from_w": -1,
+                    "sampler_name": "LMS",
+                    "batch_size": 1,
+                    "n_iter": 1,
+                    "steps": 20,
+                    "cfg_scale": 7,
+                    "width": 512,
+                    "height": 512,
+                    "restore_faces": false,
+                    "tiling": false,
+                    "do_not_save_samples": false,
+                    "do_not_save_grid": false,
+                    "negative_prompt": "",
+                    "eta": 0,
+                    "s_min_uncond": 0,
+                    "s_churn": 0,
+                    "s_tmax": 0,
+                    "s_tmin": 0,
+                    "s_noise": 1,
+                    "override_settings": {},
+                    "override_settings_restore_afterwards": true,
+                    "script_args": [],
+                    "sampler_index": "Euler",
+                    "script_name": "",
+                    "send_images": true,
+                    "save_images": false,
+                    "alwayson_scripts": {}
+                    }'''
+
+    image = webui.txt2img("MeinaMix.safetensors", input2)
     pic = decode_base64_to_image(image)
-    pic.save("1.jpg")
+    pic.save("2.jpg")
