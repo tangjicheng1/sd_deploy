@@ -24,8 +24,7 @@ output_schema = Schema([ColSpec(DataType.string, "output")])
 signature = ModelSignature(inputs=input_schema,outputs=output_schema)
 
 # Define input example
-input_example= {'model_name' : "MeinaMix.safetensors" , 'model_input' : '''{
-                    "model_name": "MeinaMix.safetensors",
+input_example= {'model_name' : "artifex-auo-ingris-cardos.safetensors" , 'model_input' : '''{
                     "enable_hr": false,
                     "denoising_strength": 0.5,
                     "firstphase_width": 0,
