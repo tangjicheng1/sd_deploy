@@ -1,0 +1,32 @@
+{
+    "control_net_model_config": "models/cldm_v15.yaml",
+    "control_net_model_adapter_config": "models/t2iadapter_sketch_sd14v1.yaml",
+    "control_net_detectedmap_dir": "detected_maps",
+    "control_net_models_path": "",
+    "control_net_modules_path": "",
+    "control_net_max_models_num": 4,
+    "control_net_model_cache_size": 1,
+    "control_net_no_detectmap": false,
+    "control_net_detectmap_autosaving": false,
+    "control_net_allow_script_control": false,
+    "control_net_sync_field_args": false,
+    "controlnet_show_batch_images_in_ui": false,
+    "controlnet_increment_seed_during_batch": false,
+    "interrogate_keep_models_in_memory": false,
+    "interrogate_return_ranks": false,
+    "interrogate_clip_num_beams": 16,
+    "interrogate_clip_min_length": 12,
+    "interrogate_clip_max_length": 48,
+    "interrogate_clip_dict_limit": 1500.0,
+    "interrogate_clip_skip_categories": [
+        "artists",
+        "flavors",
+        "mediums",
+        "movements"
+    ],
+    "interrogate_deepbooru_score_threshold": 0.75,
+    "upcast_attn": true,
+    "CLIP_stop_at_last_layers": 2,
+    "sd_vae": "kl-f8-anime2.vae.pt",
+    "sd_vae_as_default": true
+}
