@@ -1,32 +1,17 @@
-import webui
-from modules.api import api
-
 import base64
 import io
-import time
 import json
-import datetime
-import uvicorn
-from threading import Lock
 from io import BytesIO
+from typing import Dict
 
-import modules.shared as shared
-from modules import sd_samplers, deepbooru, sd_hijack, images, scripts, postprocessing
-from modules.api import models
-from modules.shared import opts
-from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
-from modules.textual_inversion.textual_inversion import create_embedding, train_embedding
-from modules.textual_inversion.preprocess import preprocess
-from modules.hypernetworks.hypernetwork import create_hypernetwork, train_hypernetwork
 from PIL import PngImagePlugin, Image
-from modules.sd_models import checkpoints_list, unload_model_weights, reload_model_weights, list_models
-from modules.sd_models_config import find_checkpoint_config_near_filename
-from modules.realesrgan_model import get_realesrgan_models
-from modules import devices
-from typing import Dict, List, Any
 import piexif
 import piexif.helper
 
+import modules.shared as shared
+from modules import scripts
+from modules.shared import opts
+from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
 from modules.call_queue import queue_lock
 
 
@@ -63,7 +48,7 @@ def encode_pil_to_base64(image):
     return base64.b64encode(bytes_data)
 
 
-def simple_txt2img(args):
+def simple_txt2img(args: Dict):
     shared.refresh_checkpoints()
 
     model_name = args.pop("sd_model_checkpoint")
@@ -72,7 +57,7 @@ def simple_txt2img(args):
     script_runner = scripts.scripts_txt2img
 
     args.pop('script_name', None)
-    # will refeed them to the pipeline directly after initializing them
+
     args.pop('script_args', None)
     args.pop('alwayson_scripts', None)
     send_images = args.pop('send_images', True)
@@ -95,9 +80,8 @@ def simple_txt2img(args):
     return b64images
 
 
-if __name__ == "__main__":
-    print("start testing for StableDiffusionWebuiWrapper ...")
-
+def test_txt2img():
+    print("[tangjicheng] Start testing text to image...")
     input2 = '''{
                     "sd_model_checkpoint": "Deliberate.safetensors",
                     "enable_hr": false,
@@ -157,3 +141,7 @@ if __name__ == "__main__":
 
     pic = Image.open(BytesIO(base64.b64decode(image)))
     pic.save("3.jpg")
+
+
+if __name__ == "__main__":
+    test_txt2img()
