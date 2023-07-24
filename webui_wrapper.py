@@ -654,10 +654,9 @@ class StableDiffusionWebuiWrapper:
 if __name__ == "__main__":
     print("start testing for StableDiffusionWebuiWrapper ...")
     webui = StableDiffusionWebuiWrapper()
-    # print(f"type: {type(models.StableDiffusionTxt2ImgProcessingAPI)}")
 
     input2='''{
-                    "model_name": "MeinaMix.safetensors",
+                    "model_name": "Deliberate.safetensors",
                     "enable_hr": false,
                     "denoising_strength": 0.5,
                     "firstphase_width": 0,
@@ -670,7 +669,7 @@ if __name__ == "__main__":
                     "hr_sampler_name": "string",
                     "hr_prompt": "",
                     "hr_negative_prompt": "",
-                    "prompt": "1girl",
+                    "prompt": "complex 3d render ultra detailed of a beautiful porcelain profile woman android face, cyborg, robotic parts, 150 mm, beautiful studio soft light, rim light, vibrant details, luxurious cyberpunk, lace, hyperrealistic, anatomical, facial muscles, cable electric wires, microchip, elegant, beautiful background, octane render, H. R. Giger style, 8k, best quality, masterpiece, illustration, an extremely delicate and beautiful, extremely detailed ,CG ,unity ,wallpaper, (realistic, photo-realistic:1.37),Amazing, finely detail, masterpiece,best quality,official art, extremely detailed CG unity 8k wallpaper, absurdres, incredibly absurdres, robot, silver halmet, full body, sitting, (masterpiece), (best quality:1.2), absurdres, (durex:1.3), condom box, condoms, durex classic jeans,8k, RAW photo, best quality, ultra high res, photorealistic, nude, full body, thigh, marie rose,",
                     "styles": [
                         "string"
                     ],
@@ -707,6 +706,6 @@ if __name__ == "__main__":
                     "alwayson_scripts": {}
                     }'''
 
-    image = webui.txt2img("MeinaMix.safetensors", input2)
+    image = webui.txt2img("Deliberate.safetensors", input2)
     pic = decode_base64_to_image(image)
     pic.save("2.jpg")
