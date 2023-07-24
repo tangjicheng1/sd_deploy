@@ -121,7 +121,7 @@ def check_versions():
     if shared.cmd_opts.skip_version_check:
         return
 
-    expected_torch_version = "2.0.0"
+    expected_torch_version = "2.0.1"
 
     if version.parse(torch.__version__) < version.parse(expected_torch_version):
         errors.print_error_explanation(f"""
@@ -134,7 +134,7 @@ there are reports of issues with training tab on the latest version.
 Use --skip-version-check commandline argument to disable this check.
         """.strip())
 
-    expected_xformers_version = "0.0.17"
+    expected_xformers_version = "0.0.20"
     if shared.xformers_available:
         import xformers
 

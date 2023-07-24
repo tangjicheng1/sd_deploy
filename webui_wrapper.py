@@ -46,14 +46,11 @@ def script_name_to_index(name, scripts):
         return [script.title().lower() for script in scripts].index(name.lower())
     except Exception as e:
         print(f"Script '{name}' not found")
-        # raise HTTPException(status_code=422, detail=f"Script '{name}' not found") from e
-
 
 def validate_sampler_name(name):
     config = sd_samplers.all_samplers_map.get(name, None)
     if config is None:
         print("Sampler not found")
-        # raise HTTPException(status_code=404, detail="Sampler not found")
 
     return name
 
@@ -192,11 +189,7 @@ class ApiWrapper:
     def text2imgapi(self, txt2imgreq: models.StableDiffusionTxt2ImgProcessingAPI):
         print(f"{api_log.get_log_head()} called text2imgapi")
         script_runner = scripts.scripts_txt2img
-        # if not script_runner.scripts:
-        #     script_runner.initialize_scripts(False)
-        #     # ui.create_ui()
-        # if not self.default_script_arg_txt2img:
-        #     self.default_script_arg_txt2img = self.init_default_script_args(script_runner)
+
         selectable_scripts, selectable_script_idx = self.get_selectable_script(txt2imgreq.script_name, script_runner)
 
         populate = txt2imgreq.copy(update={  # Override __init__ params
@@ -627,11 +620,29 @@ class ApiWrapper:
             cuda = {'error': f'{err}'}
         return models.MemoryResponse(ram=ram, cuda=cuda)
 
-    # def launch(self, server_name, port):
-    #     print(f"{api_log.get_log_head()} called launch")
-    #     self.app.include_router(self.router)
-    #     uvicorn.run(self.app, host=server_name, port=port)
+def simple_txt2img(args):
+    script_runner = scripts.scripts_txt2img
 
+    args.pop('script_name', None)
+    args.pop('script_args', None) # will refeed them to the pipeline directly after initializing them
+    args.pop('alwayson_scripts', None)
+    send_images = args.pop('send_images', True)
+    args.pop('save_images', None)
+    script_args = []
+
+    with queue_lock:
+        p = StableDiffusionProcessingTxt2Img(sd_model=shared.sd_model, **args)
+        p.scripts = script_runner
+        p.outpath_grids = opts.outdir_txt2img_grids
+        p.outpath_samples = opts.outdir_txt2img_samples
+
+        shared.state.begin()
+        p.script_args = tuple(script_args) # Need to pass args as tuple here
+        processed = process_images(p)
+        shared.state.end()
+
+    b64images = list(map(encode_pil_to_base64, processed.images)) if send_images else []
+    return b64images
 
 
 class StableDiffusionWebuiWrapper:
@@ -647,8 +658,8 @@ class StableDiffusionWebuiWrapper:
         self.api.refresh_checkpoints()
         selected_model = {"sd_model_checkpoint" : model_name}
         self.api.set_config(selected_model)
-        output = self.api.text2imgapi(txt2imgreq)
-        image = output.images[0]
+        output = simple_txt2img(vars(txt2imgreq))
+        image = output[0]
         return image
 
 if __name__ == "__main__":
@@ -656,7 +667,6 @@ if __name__ == "__main__":
     webui = StableDiffusionWebuiWrapper()
 
     input2='''{
-                    "model_name": "Deliberate.safetensors",
                     "enable_hr": false,
                     "denoising_strength": 0.5,
                     "firstphase_width": 0,
@@ -707,5 +717,5 @@ if __name__ == "__main__":
                     }'''
 
     image = webui.txt2img("Deliberate.safetensors", input2)
-    pic = decode_base64_to_image(image)
-    pic.save("2.jpg")
+    pic = Image.open(BytesIO(base64.b64decode(image)))
+    pic.save("3.jpg")
