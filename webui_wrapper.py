@@ -9,10 +9,11 @@ import piexif
 import piexif.helper
 
 import modules.shared as shared
-from modules import scripts
+from modules import scripts, script_callbacks, extensions, ui
 from modules.shared import opts
 from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
 from modules.call_queue import queue_lock
+import webui
 
 
 def encode_pil_to_base64(image):
@@ -49,12 +50,22 @@ def encode_pil_to_base64(image):
 
 
 def simple_txt2img(args: Dict):
+    webui.initialize()
+    script_callbacks.before_ui_callback()
+
+    ext_name = [iter.name for iter in extensions.extensions]
+    print("[tangjicheng] extentions: ", ext_name)
+
     shared.refresh_checkpoints()
 
     model_name = args.pop("sd_model_checkpoint")
     shared.opts.set("sd_model_checkpoint", model_name)
 
     script_runner = scripts.scripts_txt2img
+    if not script_runner.scripts:
+        script_runner.initialize_scripts(False)
+        ui.create_ui()
+
 
     args.pop('script_name', None)
 
@@ -96,7 +107,7 @@ def test_txt2img():
                     "hr_sampler_name": "string",
                     "hr_prompt": "",
                     "hr_negative_prompt": "",
-                    "prompt": "complex 3d render ultra detailed of a beautiful porcelain profile woman android face, cyborg, robotic parts, 150 mm, beautiful studio soft light, rim light, vibrant details, luxurious cyberpunk, lace, hyperrealistic, anatomical, facial muscles, cable electric wires, microchip, elegant, beautiful background, octane render, H. R. Giger style, 8k, best quality, masterpiece, illustration, an extremely delicate and beautiful, extremely detailed ,CG ,unity ,wallpaper, (realistic, photo-realistic:1.37),Amazing, finely detail, masterpiece,best quality,official art, extremely detailed CG unity 8k wallpaper, absurdres, incredibly absurdres, robot, silver halmet, full body, sitting, (masterpiece), (best quality:1.2), absurdres, (durex:1.3), condom box, condoms, durex classic jeans,8k, RAW photo, best quality, ultra high res, photorealistic, nude, full body, thigh, marie rose,",
+                    "prompt": "1girl,  <lora:test_lora:1:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0>",
                     "styles": [
                         "string"
                     ],
@@ -140,8 +151,9 @@ def test_txt2img():
     image = output[0]
 
     pic = Image.open(BytesIO(base64.b64decode(image)))
-    pic.save("3.jpg")
+    pic.save("6.jpg")
 
+# 1girl,  <lora:test_lora:1:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0>
 
 if __name__ == "__main__":
     test_txt2img()
