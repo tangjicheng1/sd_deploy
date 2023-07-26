@@ -51,17 +51,30 @@ def encode_pil_to_base64(image):
     return base64.b64encode(bytes_data)
 
 
-def init_script_args_for_always_on(self, request, default_script_args, selectable_scripts, selectable_idx, script_runner):
+def script_name_to_index(name, scripts):
+    try:
+        return [script.title().lower() for script in scripts].index(name.lower())
+    except Exception as e:
+        print(f"Script '{name}' not found")
+        # TODO
+        # raise HTTPException(status_code=422, detail=f"Script '{name}' not found") from e
+
+
+def get_script(script_name, script_runner):
+    if script_name is None or script_name == "":
+        return None, None
+
+    script_idx = script_name_to_index(script_name, script_runner.scripts)
+    print(f"[tangjicheng] script_name: {script_name}, script_idx: {script_idx}")
+    return script_runner.scripts[script_idx]
+
+def init_script_args_for_always_on(default_script_args, alwayson_scripts, script_runner):
     script_args = default_script_args.copy()
-    # position 0 in script_arg is the idx+1 of the selectable script that is going to be run when using scripts.scripts_*2img.run()
-    if selectable_scripts:
-        script_args[selectable_scripts.args_from:selectable_scripts.args_to] = request.script_args
-        script_args[0] = selectable_idx + 1
 
     # Now check for always on scripts
-    if request.alwayson_scripts and (len(request.alwayson_scripts) > 0):
-        for alwayson_script_name in request.alwayson_scripts.keys():
-            alwayson_script = self.get_script(alwayson_script_name, script_runner)
+    if alwayson_scripts and (len(alwayson_scripts) > 0):
+        for alwayson_script_name in alwayson_scripts.keys():
+            alwayson_script = get_script(alwayson_script_name, script_runner)
             if alwayson_script is None:
                 # TODO
                 # raise HTTPException(status_code=422, detail=f"always on script {alwayson_script_name} not found")
@@ -72,10 +85,10 @@ def init_script_args_for_always_on(self, request, default_script_args, selectabl
                 # raise HTTPException(status_code=422, detail="Cannot have a selectable script in the always on scripts params")
                 print("Cannot have a selectable script in the always on scripts params")
             # always on script with no arg should always run so you don't really need to add them to the requests
-            if "args" in request.alwayson_scripts[alwayson_script_name]:
+            if "args" in alwayson_scripts[alwayson_script_name]:
                 # min between arg length in scriptrunner and arg length in the request
-                for idx in range(0, min((alwayson_script.args_to - alwayson_script.args_from), len(request.alwayson_scripts[alwayson_script_name]["args"]))):
-                    script_args[alwayson_script.args_from + idx] = request.alwayson_scripts[alwayson_script_name]["args"][idx]
+                for idx in range(0, min((alwayson_script.args_to - alwayson_script.args_from), len(alwayson_scripts[alwayson_script_name]["args"]))):
+                    script_args[alwayson_script.args_from + idx] = alwayson_scripts[alwayson_script_name]["args"][idx]
     return script_args
 
 
@@ -127,9 +140,11 @@ def simple_txt2img(args: Dict):
     args.pop('script_name', None)
 
     args.pop('script_args', None)
-    args.pop('alwayson_scripts', None)
+    alwayson_scripts = args.pop('alwayson_scripts', None)
     send_images = args.pop('send_images', True)
     args.pop('save_images', None)
+
+    script_args = init_script_args_for_always_on(script_args, alwayson_scripts, script_runner)
 
     with queue_lock:
         p = StableDiffusionProcessingTxt2Img(sd_model=shared.sd_model, **args)
@@ -217,7 +232,7 @@ def test_txt2img():
     image = output[0]
 
     pic = Image.open(BytesIO(base64.b64decode(image)))
-    pic.save("21.jpg")
+    pic.save("23.jpg")
 
 # 1girl,  <lora:test_lora:1:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0>
 
