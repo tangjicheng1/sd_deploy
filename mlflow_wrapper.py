@@ -24,7 +24,7 @@ output_schema = Schema([ColSpec(DataType.string, "output")])
 signature = ModelSignature(inputs=input_schema,outputs=output_schema)
 
 # Define input example
-input_example = '''{
+input_value = '''{
                 "sd_model_checkpoint": "v1-5-pruned-emaonly",
                 "enable_hr": false,
                 "denoising_strength": 0.5,
@@ -74,6 +74,8 @@ input_example = '''{
                 "save_images": false,
                 "alwayson_scripts": {}
                 }'''
+
+input_example = {"input": input_value}
 
 # Log the model with its details such as artifacts, pip requirements and input example
 with mlflow.start_run() as run:  
