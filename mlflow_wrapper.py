@@ -8,7 +8,7 @@ from mlflow.types import DataType, Schema, ColSpec, TensorSpec
 
 from webui_wrapper import simple_txt2img_test
 
-mlflow.set_experiment("sd0728")
+mlflow.set_experiment("/Users/tang.j@ctw.inc/sd0728")
 
 # Define custom Python model class
 class StableDiffusion(mlflow.pyfunc.PythonModel):
