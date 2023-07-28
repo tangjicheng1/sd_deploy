@@ -28,20 +28,30 @@ def encode_pil_to_base64(image):
                 if isinstance(key, str) and isinstance(value, str):
                     metadata.add_text(key, value)
                     use_metadata = True
-            image.save(output_bytes, format="PNG", pnginfo=(
-                metadata if use_metadata else None), quality=opts.jpeg_quality)
+            image.save(output_bytes,
+                       format="PNG",
+                       pnginfo=(metadata if use_metadata else None),
+                       quality=opts.jpeg_quality)
 
         elif opts.samples_format.lower() in ("jpg", "jpeg", "webp"):
             parameters = image.info.get('parameters', None)
             exif_bytes = piexif.dump({
-                "Exif": {piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(parameters or "", encoding="unicode")}
+                "Exif": {
+                    piexif.ExifIFD.UserComment:
+                    piexif.helper.UserComment.dump(parameters or "",
+                                                   encoding="unicode")
+                }
             })
             if opts.samples_format.lower() in ("jpg", "jpeg"):
-                image.save(output_bytes, format="JPEG",
-                           exif=exif_bytes, quality=opts.jpeg_quality)
+                image.save(output_bytes,
+                           format="JPEG",
+                           exif=exif_bytes,
+                           quality=opts.jpeg_quality)
             else:
-                image.save(output_bytes, format="WEBP",
-                           exif=exif_bytes, quality=opts.jpeg_quality)
+                image.save(output_bytes,
+                           format="WEBP",
+                           exif=exif_bytes,
+                           quality=opts.jpeg_quality)
 
         else:
             # TODO
@@ -58,18 +68,20 @@ def get_default_args(script_runner):
         if last_arg_index < script.args_to:
             last_arg_index = script.args_to
     # None everywhere except position 0 to initialize script args
-    script_args = [None]*last_arg_index
+    script_args = [None] * last_arg_index
     script_args[0] = 0
 
     # get default values
-    with gr.Blocks(): # will throw errors calling ui function without this
+    with gr.Blocks():  # will throw errors calling ui function without this
         for script in script_runner.scripts:
             if script.ui(script.is_img2img):
                 ui_default_values = []
                 for elem in script.ui(script.is_img2img):
                     ui_default_values.append(elem.value)
-                script_args[script.args_from:script.args_to] = ui_default_values
+                script_args[script.args_from:script.
+                            args_to] = ui_default_values
     return script_args
+
 
 def simple_txt2img(args: Dict):
     webui.initialize()
@@ -87,7 +99,6 @@ def simple_txt2img(args: Dict):
     script_runner = scripts.scripts_txt2img
     if not script_runner.scripts:
         script_runner.initialize_scripts(False)
-
 
     # default_script_args = [0, 'NONE:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\nALL:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1\nINS:1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0\nIND:1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0\nINALL:1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0\nMIDD:1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0\nOUTD:1,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0\nOUTS:1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1\nOUTALL:1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1\nALL0.5:0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5', True, 'Disable', 'values', '0,0.25,0.5,0.75,1', 'Block ID', 'IN05-OUT05', 'none', '', '0.5,1', 'BASE,IN00,IN01,IN02,IN03,IN04,IN05,IN06,IN07,IN08,IN09,IN10,IN11,M00,OUT00,OUT01,OUT02,OUT03,OUT04,OUT05,OUT06,OUT07,OUT08,OUT09,OUT10,OUT11', 1.0, 'black', '20', False, 'ATTNDEEPON:IN05-OUT05:attn:1\n\nATTNDEEPOFF:IN05-OUT05:attn:0\n\nPROJDEEPOFF:IN05-OUT05:proj:0\n\nXYZ:::1', False, False, False, 'positive', 'comma', 0, False, False, '', 'Seed', '', None, 'Nothing', '', None, 'Nothing', '', None, True, False, False, False, 0]
 
@@ -114,15 +125,15 @@ def simple_txt2img(args: Dict):
         processed = process_images(p)
         shared.state.end()
 
-    b64images = list(map(encode_pil_to_base64, processed.images)
-                     ) if send_images else []
+    b64images = list(map(encode_pil_to_base64,
+                         processed.images)) if send_images else []
     return b64images
 
 
 def test_txt2img():
     print("[tangjicheng] Start testing text to image...")
     input2 = '''{
-                    "sd_model_checkpoint": "Deliberate.safetensors",
+                    "sd_model_checkpoint": "v1-5-pruned-emaonly",
                     "enable_hr": false,
                     "denoising_strength": 0.5,
                     "firstphase_width": 0,
@@ -135,7 +146,7 @@ def test_txt2img():
                     "hr_sampler_name": "string",
                     "hr_prompt": "",
                     "hr_negative_prompt": "",
-                    "prompt": "1girl,  <lora:test_lora:1:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0>",
+                    "prompt": "1girl",
                     "styles": [
                         "string"
                     ],
@@ -180,6 +191,7 @@ def test_txt2img():
 
     pic = Image.open(BytesIO(base64.b64decode(image)))
     pic.save("15.jpg")
+
 
 # 1girl,  <lora:test_lora:1:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0>
 
