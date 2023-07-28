@@ -131,7 +131,7 @@ def simple_txt2img(args: Dict):
 
 
 def simple_txt2img_test(input:str):
-    print("[tangjicheng] Start testing text to image...")
+    print("[tangjicheng] Start simple_txt2img_test ...")
 
     model_input = json.loads(input)
 
@@ -140,11 +140,7 @@ def simple_txt2img_test(input:str):
     image = output[0]
     return image
 
-    pic = Image.open(BytesIO(base64.b64decode(image)))
-    pic.save("15.jpg")
-
 def test_txt2img():
-    print("[tangjicheng] Start testing text to image...")
     input2 = '''{
                     "sd_model_checkpoint": "v1-5-pruned-emaonly",
                     "enable_hr": false,
