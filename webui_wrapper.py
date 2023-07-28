@@ -138,6 +138,7 @@ def simple_txt2img_test(input:str):
     output = simple_txt2img(model_input)
 
     image = output[0]
+    print(type(image))
     return image
 
 def test_txt2img():
