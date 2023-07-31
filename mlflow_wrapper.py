@@ -89,6 +89,7 @@ with mlflow.start_run() as run:
         input_example=input_example,
         signature=signature,
         code_path=["/databricks/driver/stable-diffusion-webui"],
+        await_registration_for=6000,
     )
 
 # Register model in MLflow Model Registry
