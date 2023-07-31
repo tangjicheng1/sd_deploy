@@ -95,7 +95,8 @@ with mlflow.start_run() as run:
 # Register model in MLflow Model Registry
 result = mlflow.register_model(
     "runs:/"+run.info.run_id+"/model",
-    "func0728"
+    "func0728",
+    await_registration_for=6000,
 )
 
 # Load the logged model
