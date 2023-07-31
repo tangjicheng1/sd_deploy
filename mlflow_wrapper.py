@@ -88,7 +88,7 @@ with mlflow.start_run() as run:
         pip_requirements=["transformers","torch", "accelerate", "xformers"],
         input_example=input_example,
         signature=signature,
-        code_path=["/databricks/driver/stable-diffusion-webui"],
+        code_path=["/databricks/driver/stable-diffusion-webui", "/databricks/driver/stable-diffusion-webui/modules"],
         await_registration_for=6000,
     )
 
