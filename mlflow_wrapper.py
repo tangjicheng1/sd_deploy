@@ -87,7 +87,8 @@ with mlflow.start_run() as run:
         artifacts={},
         pip_requirements=["transformers","torch", "accelerate", "xformers"],
         input_example=input_example,
-        signature=signature
+        signature=signature,
+        code_path=["/databricks/driver/stable-diffusion-webui"],
     )
 
 # Register model in MLflow Model Registry
