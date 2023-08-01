@@ -85,10 +85,10 @@ with mlflow.start_run() as run:
         "model",
         python_model=StableDiffusion(),
         artifacts={},
-        pip_requirements=["transformers","torch", "accelerate", "xformers"],
+        pip_requirements=["transformers","torch", "accelerate", "xformers","piexif", "gradio"],
         input_example=input_example,
         signature=signature,
-        code_path=["/dbfs/tmp/stable-diffusion-webui"],
+        code_path=["/Workspace/Repos/satoshi.okayama@databricks.com/stable-diffusion-webui/webui_wrapper.py", "/Workspace/Repos/satoshi.okayama@databricks.com/stable-diffusion-webui/modules/"],
         await_registration_for=6000,
     )
 
