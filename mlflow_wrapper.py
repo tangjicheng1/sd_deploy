@@ -88,7 +88,7 @@ with mlflow.start_run() as run:
         pip_requirements=["transformers","torch", "torchvision", "accelerate", "xformers","piexif", "gradio"],
         input_example=input_example,
         signature=signature,
-        code_path=["/Workspace/Repos/satoshi.okayama@databricks.com/stable-diffusion-webui/webui_wrapper.py", "/Workspace/Repos/satoshi.okayama@databricks.com/stable-diffusion-webui/modules/"],
+        code_path=["/Workspace/Repos/satoshi.okayama@databricks.com/stable-diffusion-webui/webui_wrapper.py", "/Workspace/Repos/satoshi.okayama@databricks.com/stable-diffusion-webui/modules/", "/Workspace/Repos/satoshi.okayama@databricks.com/k-diffusion/k_diffusion", "/Workspace/Repos/satoshi.okayama@databricks.com/stablediffusion/ldm"],
         await_registration_for=6000,
     )
 
