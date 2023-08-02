@@ -20,13 +20,18 @@ for possible_sd_path in possible_sd_paths:
 if sd_path is None:
     print(f"Couldn't find Stable Diffusion in any of: {possible_sd_paths}")
 
+BLIP_path = os.path.join(script_path, 'repositories/BLIP')
+
 path_dirs = [
-    (sd_path, 'ldm', 'Stable Diffusion', []),
-    (os.path.join(sd_path, '../taming-transformers'), 'taming', 'Taming Transformers', []),
-    (os.path.join(sd_path, '../CodeFormer'), 'inference_codeformer.py', 'CodeFormer', []),
-    (os.path.join(sd_path, '../BLIP'), 'models/blip.py', 'BLIP', []),
-    (os.path.join(sd_path, '../k-diffusion'), 'k_diffusion/sampling.py', 'k_diffusion', ["atstart"]),
+    # (sd_path, 'ldm', 'Stable Diffusion', []),
+    (os.path.join(BLIP_path, '../taming-transformers'), 'taming', 'Taming Transformers', []),
+    (os.path.join(BLIP_path, '../CodeFormer'), 'inference_codeformer.py', 'CodeFormer', []),
+    (os.path.join(BLIP_path, '../BLIP'), 'models/blip.py', 'BLIP', []),
+    (os.path.join(BLIP_path, '../k-diffusion'), 'k_diffusion/sampling.py', 'k_diffusion', ["atstart"]),
 ]
+
+print(f"[tangjicheng] sd_path: {sd_path}")
+print(f"[tangjicheng] script_path: {script_path}")
 
 paths = {}
 
