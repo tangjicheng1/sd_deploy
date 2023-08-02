@@ -13,11 +13,9 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from secrets import compare_digest
 
-import modules.shared as shared
+from modules import shared, processing
 from modules import sd_samplers, deepbooru, sd_hijack, images, scripts, ui, postprocessing
 from modules.api import models
-from modules.shared import opts
-from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
 from modules.textual_inversion.textual_inversion import create_embedding, train_embedding
 from modules.textual_inversion.preprocess import preprocess
 from modules.hypernetworks.hypernetwork import create_hypernetwork, train_hypernetwork
@@ -74,24 +72,24 @@ def decode_base64_to_image(encoding):
 def encode_pil_to_base64(image):
     with io.BytesIO() as output_bytes:
 
-        if opts.samples_format.lower() == 'png':
+        if shared.opts.samples_format.lower() == 'png':
             use_metadata = False
             metadata = PngImagePlugin.PngInfo()
             for key, value in image.info.items():
                 if isinstance(key, str) and isinstance(value, str):
                     metadata.add_text(key, value)
                     use_metadata = True
-            image.save(output_bytes, format="PNG", pnginfo=(metadata if use_metadata else None), quality=opts.jpeg_quality)
+            image.save(output_bytes, format="PNG", pnginfo=(metadata if use_metadata else None), quality=shared.opts.jpeg_quality)
 
-        elif opts.samples_format.lower() in ("jpg", "jpeg", "webp"):
+        elif shared.opts.samples_format.lower() in ("jpg", "jpeg", "webp"):
             parameters = image.info.get('parameters', None)
             exif_bytes = piexif.dump({
                 "Exif": { piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(parameters or "", encoding="unicode") }
             })
-            if opts.samples_format.lower() in ("jpg", "jpeg"):
-                image.save(output_bytes, format="JPEG", exif = exif_bytes, quality=opts.jpeg_quality)
+            if shared.opts.samples_format.lower() in ("jpg", "jpeg"):
+                image.save(output_bytes, format="JPEG", exif = exif_bytes, quality=shared.opts.jpeg_quality)
             else:
-                image.save(output_bytes, format="WEBP", exif = exif_bytes, quality=opts.jpeg_quality)
+                image.save(output_bytes, format="WEBP", exif = exif_bytes, quality=shared.opts.jpeg_quality)
 
         else:
             raise HTTPException(status_code=500, detail="Invalid image format")
@@ -323,10 +321,10 @@ class Api:
         args.pop('save_images', None)
 
         with self.queue_lock:
-            p = StableDiffusionProcessingTxt2Img(sd_model=shared.sd_model, **args)
+            p = processing.StableDiffusionProcessingTxt2Img(sd_model=shared.sd_model, **args)
             p.scripts = script_runner
-            p.outpath_grids = opts.outdir_txt2img_grids
-            p.outpath_samples = opts.outdir_txt2img_samples
+            p.outpath_grids = shared.opts.outdir_txt2img_grids
+            p.outpath_samples = shared.opts.outdir_txt2img_samples
 
             shared.state.begin()
             if selectable_scripts is not None:
@@ -334,7 +332,7 @@ class Api:
                 processed = scripts.scripts_txt2img.run(p, *p.script_args) # Need to pass args as list here
             else:
                 p.script_args = tuple(script_args) # Need to pass args as tuple here
-                processed = process_images(p)
+                processed = processing.process_images(p)
             shared.state.end()
 
         b64images = list(map(encode_pil_to_base64, processed.images)) if send_images else []
@@ -380,11 +378,11 @@ class Api:
         args.pop('save_images', None)
 
         with self.queue_lock:
-            p = StableDiffusionProcessingImg2Img(sd_model=shared.sd_model, **args)
+            p = processing.StableDiffusionProcessingImg2Img(sd_model=shared.sd_model, **args)
             p.init_images = [decode_base64_to_image(x) for x in init_images]
             p.scripts = script_runner
-            p.outpath_grids = opts.outdir_img2img_grids
-            p.outpath_samples = opts.outdir_img2img_samples
+            p.outpath_grids = shared.opts.outdir_img2img_grids
+            p.outpath_samples = shared.opts.outdir_img2img_samples
 
             shared.state.begin()
             if selectable_scripts is not None:
@@ -392,7 +390,7 @@ class Api:
                 processed = scripts.scripts_img2img.run(p, *p.script_args) # Need to pass args as list here
             else:
                 p.script_args = tuple(script_args) # Need to pass args as tuple here
-                processed = process_images(p)
+                processed = processing.process_images(p)
             shared.state.end()
 
         b64images = list(map(encode_pil_to_base64, processed.images)) if send_images else []
