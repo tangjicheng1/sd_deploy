@@ -17,7 +17,8 @@ for possible_sd_path in possible_sd_paths:
         break
 
 # assert sd_path is not None, f"Couldn't find Stable Diffusion in any of: {possible_sd_paths}"
-print(f"Couldn't find Stable Diffusion in any of: {possible_sd_paths}")
+if sd_path is None:
+    print(f"Couldn't find Stable Diffusion in any of: {possible_sd_paths}")
 
 path_dirs = [
     (sd_path, 'ldm', 'Stable Diffusion', []),
