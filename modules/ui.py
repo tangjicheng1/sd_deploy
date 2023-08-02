@@ -23,8 +23,8 @@ import modules.codeformer_model
 import modules.generation_parameters_copypaste as parameters_copypaste
 import modules.gfpgan_model
 import modules.hypernetworks.ui
-import modules.scripts
-import modules.shared as shared
+from modules import scripts
+from modules import shared
 import modules.styles
 import modules.textual_inversion.ui
 from modules import prompt_parser
@@ -441,8 +441,8 @@ def create_ui():
 
     parameters_copypaste.reset()
 
-    modules.scripts.scripts_current = modules.scripts.scripts_txt2img
-    modules.scripts.scripts_txt2img.initialize_scripts(is_img2img=False)
+    scripts.scripts_current = scripts.scripts_txt2img
+    scripts.scripts_txt2img.initialize_scripts(is_img2img=False)
 
     with gr.Blocks(analytics_enabled=False) as txt2img_interface:
         txt2img_prompt, txt2img_prompt_styles, txt2img_negative_prompt, submit, _, _, txt2img_prompt_style_apply, txt2img_save_style, txt2img_paste, extra_networks_button, token_counter, token_button, negative_token_counter, negative_token_button, restore_progress_button = create_toprow(is_img2img=False)
@@ -522,7 +522,7 @@ def create_ui():
 
                     elif category == "scripts":
                         with FormGroup(elem_id="txt2img_script_container"):
-                            custom_inputs = modules.scripts.scripts_txt2img.setup_ui()
+                            custom_inputs = scripts.scripts_txt2img.setup_ui()
 
             hr_resolution_preview_inputs = [enable_hr, width, height, hr_scale, hr_resize_x, hr_resize_y]
 
@@ -654,7 +654,7 @@ def create_ui():
                 (hr_prompt, "Hires prompt"),
                 (hr_negative_prompt, "Hires negative prompt"),
                 (hr_prompts_container, lambda d: gr.update(visible=True) if d.get("Hires prompt", "") != "" or d.get("Hires negative prompt", "") != "" else gr.update()),
-                *modules.scripts.scripts_txt2img.infotext_fields
+                *scripts.scripts_txt2img.infotext_fields
             ]
             parameters_copypaste.add_paste_fields("txt2img", None, txt2img_paste_fields, override_settings)
             parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
@@ -677,8 +677,8 @@ def create_ui():
 
             ui_extra_networks.setup_ui(extra_networks_ui, txt2img_gallery)
 
-    modules.scripts.scripts_current = modules.scripts.scripts_img2img
-    modules.scripts.scripts_img2img.initialize_scripts(is_img2img=True)
+    scripts.scripts_current = scripts.scripts_img2img
+    scripts.scripts_img2img.initialize_scripts(is_img2img=True)
 
     with gr.Blocks(analytics_enabled=False) as img2img_interface:
         img2img_prompt, img2img_prompt_styles, img2img_negative_prompt, submit, img2img_interrogate, img2img_deepbooru, img2img_prompt_style_apply, img2img_save_style, img2img_paste, extra_networks_button, token_counter, token_button, negative_token_counter, negative_token_button, restore_progress_button = create_toprow(is_img2img=True)
@@ -858,7 +858,7 @@ def create_ui():
 
                     elif category == "scripts":
                         with FormGroup(elem_id="img2img_script_container"):
-                            custom_inputs = modules.scripts.scripts_img2img.setup_ui()
+                            custom_inputs = scripts.scripts_img2img.setup_ui()
 
                     elif category == "inpaint":
                         with FormGroup(elem_id="inpaint_controls", visible=False) as inpaint_controls:
@@ -1053,7 +1053,7 @@ def create_ui():
                 (seed_resize_from_h, "Seed resize from-2"),
                 (denoising_strength, "Denoising strength"),
                 (mask_blur, "Mask blur"),
-                *modules.scripts.scripts_img2img.infotext_fields
+                *scripts.scripts_img2img.infotext_fields
             ]
             parameters_copypaste.add_paste_fields("img2img", init_img, img2img_paste_fields, override_settings)
             parameters_copypaste.add_paste_fields("inpaint", init_img_with_mask, img2img_paste_fields, override_settings)
@@ -1061,7 +1061,7 @@ def create_ui():
                 paste_button=img2img_paste, tabname="img2img", source_text_component=img2img_prompt, source_image_component=None,
             ))
 
-    modules.scripts.scripts_current = None
+    scripts.scripts_current = None
 
     with gr.Blocks(analytics_enabled=False) as extras_interface:
         ui_postprocessing.create_ui()
@@ -1634,7 +1634,7 @@ def create_ui():
         )
 
         def reload_scripts():
-            modules.scripts.reload_script_body_only()
+            scripts.reload_script_body_only()
             reload_javascript()  # need to refresh the html page
 
         reload_script_bodies.click(
@@ -1810,10 +1810,10 @@ def javascript_html():
     script_js = os.path.join(script_path, "script.js")
     head += f'<script type="text/javascript" src="{webpath(script_js)}"></script>\n'
 
-    for script in modules.scripts.list_scripts("javascript", ".js"):
+    for script in scripts.list_scripts("javascript", ".js"):
         head += f'<script type="text/javascript" src="{webpath(script.path)}"></script>\n'
 
-    for script in modules.scripts.list_scripts("javascript", ".mjs"):
+    for script in scripts.list_scripts("javascript", ".mjs"):
         head += f'<script type="module" src="{webpath(script.path)}"></script>\n'
 
     if cmd_opts.theme:
@@ -1828,7 +1828,7 @@ def css_html():
     def stylesheet(fn):
         return f'<link rel="stylesheet" property="stylesheet" href="{webpath(fn)}">'
 
-    for cssfile in modules.scripts.list_files_with_name("style.css"):
+    for cssfile in scripts.list_files_with_name("style.css"):
         if not os.path.isfile(cssfile):
             continue
 
