@@ -495,7 +495,7 @@ def preload_extensions_git_metadata():
 
 
 def create_ui():
-    from modules import ui
+    from modules import ui as ui_module
 
     config_states.list_config_states()
 
@@ -555,31 +555,31 @@ def create_ui():
                 available_extensions_table = gr.HTML()
 
                 refresh_available_extensions_button.click(
-                    fn=ui.wrap_gradio_call(refresh_available_extensions, extra_outputs=[gr.update(), gr.update(), gr.update()]),
+                    fn=ui_module.wrap_gradio_call(refresh_available_extensions, extra_outputs=[gr.update(), gr.update(), gr.update()]),
                     inputs=[available_extensions_index, hide_tags, sort_column],
                     outputs=[available_extensions_index, available_extensions_table, hide_tags, install_result, search_extensions_text],
                 )
 
                 install_extension_button.click(
-                    fn=ui.wrap_gradio_call(install_extension_from_index, extra_outputs=[gr.update(), gr.update()]),
+                    fn=ui_module.wrap_gradio_call(install_extension_from_index, extra_outputs=[gr.update(), gr.update()]),
                     inputs=[extension_to_install, hide_tags, sort_column, search_extensions_text],
                     outputs=[available_extensions_table, extensions_table, install_result],
                 )
 
                 search_extensions_text.change(
-                    fn=ui.wrap_gradio_call(search_extensions, extra_outputs=[gr.update()]),
+                    fn=ui_module.wrap_gradio_call(search_extensions, extra_outputs=[gr.update()]),
                     inputs=[search_extensions_text, hide_tags, sort_column],
                     outputs=[available_extensions_table, install_result],
                 )
 
                 hide_tags.change(
-                    fn=ui.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
+                    fn=ui_module.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
                     inputs=[hide_tags, sort_column, search_extensions_text],
                     outputs=[available_extensions_table, install_result]
                 )
 
                 sort_column.change(
-                    fn=ui.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
+                    fn=ui_module.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
                     inputs=[hide_tags, sort_column, search_extensions_text],
                     outputs=[available_extensions_table, install_result]
                 )
