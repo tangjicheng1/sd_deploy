@@ -434,8 +434,8 @@ def create_override_settings_dropdown(tabname, row):
 
 
 def create_ui():
-    import modules.img2img
-    import modules.txt2img
+    from modules import txt2img
+    from modules import img2img
 
     reload_javascript()
 
@@ -549,7 +549,7 @@ def create_ui():
             connect_reuse_seed(subseed, reuse_subseed, generation_info, dummy_component, is_subseed=True)
 
             txt2img_args = dict(
-                fn=call_queue.wrap_gradio_gpu_call(modules.txt2img.txt2img, extra_outputs=[None, '', '']),
+                fn=call_queue.wrap_gradio_gpu_call(txt2img.txt2img, extra_outputs=[None, '', '']),
                 _js="submit",
                 inputs=[
                     dummy_component,
@@ -906,7 +906,7 @@ def create_ui():
             )
 
             img2img_args = dict(
-                fn=call_queue.wrap_gradio_gpu_call(modules.img2img.img2img, extra_outputs=[None, '', '']),
+                fn=call_queue.wrap_gradio_gpu_call(img2img.img2img, extra_outputs=[None, '', '']),
                 _js="submit_img2img",
                 inputs=[
                     dummy_component,
