@@ -9,11 +9,7 @@ import gradio as gr
 import torch
 import tqdm
 
-import modules.interrogate
-import modules.memmon
-import modules.styles
-import modules.devices as devices
-from modules import localization, script_loading, errors, ui_components, shared_items, cmd_args
+from modules import devices, styles, memmon, interrogate, localization, script_loading, errors, ui_components, shared_items, cmd_args
 from modules.paths_internal import models_path, script_path, data_path, sd_configs_path, sd_default_config, sd_model_file, default_sd_model_file, extensions_dir, extensions_builtin_dir  # noqa: F401
 from ldm.models.diffusion.ddpm import LatentDiffusion
 from typing import Optional
@@ -221,11 +217,11 @@ class State:
         if self.current_latent is None:
             return
 
-        import modules.sd_samplers
+        from modules import sd_samplers
         if opts.show_progress_grid:
-            self.assign_current_image(modules.sd_samplers.samples_to_image_grid(self.current_latent))
+            self.assign_current_image(sd_samplers.samples_to_image_grid(self.current_latent))
         else:
-            self.assign_current_image(modules.sd_samplers.sample_to_image(self.current_latent))
+            self.assign_current_image(sd_samplers.sample_to_image(self.current_latent))
 
         self.current_image_sampling_step = self.sampling_step
 
@@ -238,9 +234,9 @@ state = State()
 state.server_start = time.time()
 
 styles_filename = cmd_opts.styles_file
-prompt_styles = modules.styles.StyleDatabase(styles_filename)
+prompt_styles = styles.StyleDatabase(styles_filename)
 
-interrogator = modules.interrogate.InterrogateModels("interrogate")
+interrogator = interrogate.InterrogateModels("interrogate")
 
 face_restorers = []
 
@@ -444,7 +440,7 @@ options_templates.update(options_section(('interrogate', "Interrogate Options"),
     "interrogate_clip_min_length": OptionInfo(24, "BLIP: minimum description length", gr.Slider, {"minimum": 1, "maximum": 128, "step": 1}),
     "interrogate_clip_max_length": OptionInfo(48, "BLIP: maximum description length", gr.Slider, {"minimum": 1, "maximum": 256, "step": 1}),
     "interrogate_clip_dict_limit": OptionInfo(1500, "CLIP: maximum number of lines in text file").info("0 = No limit"),
-    "interrogate_clip_skip_categories": OptionInfo([], "CLIP: skip inquire categories", gr.CheckboxGroup, lambda: {"choices": modules.interrogate.category_types()}, refresh=modules.interrogate.category_types),
+    "interrogate_clip_skip_categories": OptionInfo([], "CLIP: skip inquire categories", gr.CheckboxGroup, lambda: {"choices": interrogate.category_types()}, refresh=interrogate.category_types),
     "interrogate_deepbooru_score_threshold": OptionInfo(0.5, "deepbooru: score threshold", gr.Slider, {"minimum": 0, "maximum": 1, "step": 0.01}),
     "deepbooru_sort_alpha": OptionInfo(True, "deepbooru: sort tags alphabetically").info("if not: sort by score"),
     "deepbooru_use_spaces": OptionInfo(True, "deepbooru: use spaces in tags").info("if not: use underscores"),
@@ -801,7 +797,7 @@ class TotalTQDM:
 
 total_tqdm = TotalTQDM()
 
-mem_mon = modules.memmon.MemUsageMonitor("MemMon", device, opts)
+mem_mon = memmon.MemUsageMonitor("MemMon", device, opts)
 mem_mon.start()
 
 
