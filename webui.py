@@ -47,22 +47,22 @@ if ".dev" in torch.__version__ or "+git" in torch.__version__:
     torch.__version__ = re.search(r'[\d.]+[\d]', torch.__version__).group(0)
 
 from modules import shared, sd_samplers, upscaler, extensions, localization, ui_tempdir, ui_extra_networks, config_states
-import modules.codeformer_model as codeformer
-import modules.face_restoration
-import modules.gfpgan_model as gfpgan
-import modules.img2img
+from modules import codeformer_model as codeformer
+from modules import face_restoration
+from modules import gfpgan_model as gfpgan
+from modules import img2img
 
-import modules.lowvram
-import modules.scripts
-import modules.sd_hijack
-import modules.sd_hijack_optimizations
-import modules.sd_vae
-import modules.txt2img
-import modules.script_callbacks
+from modules import lowvram
+from modules import scripts
+from modules import sd_hijack
+from modules import sd_hijack_optimizations
+from modules import sd_vae
+from modules import txt2img
+from modules import script_callbacks
 import modules.textual_inversion.textual_inversion
-import modules.progress
+from modules import progress
 
-import modules.ui
+from modules import ui
 from modules import modelloader
 from modules.shared import cmd_opts
 import modules.hypernetworks.hypernetwork
@@ -222,11 +222,11 @@ def configure_sigint_handler():
 
 def configure_opts_onchange():
     shared.opts.onchange("sd_model_checkpoint", wrap_queued_call(lambda: sd_models.reload_model_weights()), call=False)
-    shared.opts.onchange("sd_vae", wrap_queued_call(lambda: modules.sd_vae.reload_vae_weights()), call=False)
-    shared.opts.onchange("sd_vae_as_default", wrap_queued_call(lambda: modules.sd_vae.reload_vae_weights()), call=False)
+    shared.opts.onchange("sd_vae", wrap_queued_call(lambda: sd_vae.reload_vae_weights()), call=False)
+    shared.opts.onchange("sd_vae_as_default", wrap_queued_call(lambda: sd_vae.reload_vae_weights()), call=False)
     shared.opts.onchange("temp_dir", ui_tempdir.on_tmpdir_changed)
     shared.opts.onchange("gradio_theme", shared.reload_gradio_theme)
-    shared.opts.onchange("cross_attention_optimization", wrap_queued_call(lambda: modules.sd_hijack.model_hijack.redo_hijack(shared.sd_model)), call=False)
+    shared.opts.onchange("cross_attention_optimization", wrap_queued_call(lambda: sd_hijack.model_hijack.redo_hijack(shared.sd_model)), call=False)
     startup_timer.record("opts onchange")
 
 
@@ -266,7 +266,7 @@ def initialize_rest(*, reload_script_modules=False):
 
     if cmd_opts.ui_debug_mode:
         shared.sd_upscalers = upscaler.UpscalerLanczos().scalers
-        modules.scripts.load_scripts()
+        scripts.load_scripts()
         return
 
     sd_models.list_models()
@@ -274,7 +274,7 @@ def initialize_rest(*, reload_script_modules=False):
 
     localization.list_localizations(cmd_opts.localizations_dir)
 
-    modules.scripts.load_scripts()
+    scripts.load_scripts()
     startup_timer.record("load scripts")
 
     if reload_script_modules:
@@ -285,13 +285,13 @@ def initialize_rest(*, reload_script_modules=False):
     modelloader.load_upscalers()
     startup_timer.record("load upscalers")
 
-    modules.sd_vae.refresh_vae_list()
+    sd_vae.refresh_vae_list()
     startup_timer.record("refresh VAE")
     modules.textual_inversion.textual_inversion.list_textual_inversion_templates()
     startup_timer.record("refresh textual inversion templates")
 
-    modules.script_callbacks.on_list_optimizers(modules.sd_hijack_optimizations.list_optimizers)
-    modules.sd_hijack.list_optimizers()
+    script_callbacks.on_list_optimizers(sd_hijack_optimizations.list_optimizers)
+    sd_hijack.list_optimizers()
     startup_timer.record("scripts list_optimizers")
 
     def load_model():
@@ -304,8 +304,8 @@ def initialize_rest(*, reload_script_modules=False):
 
         shared.sd_model  # noqa: B018
 
-        if modules.sd_hijack.current_optimizer is None:
-            modules.sd_hijack.apply_optimizations()
+        if sd_hijack.current_optimizer is None:
+            sd_hijack.apply_optimizations()
 
     Thread(target=load_model).start()
 
@@ -353,7 +353,7 @@ def api_only():
     setup_middleware(app)
     api = create_api(app)
 
-    modules.script_callbacks.app_started_callback(None, app)
+    script_callbacks.app_started_callback(None, app)
 
     print(f"Startup time: {startup_timer.summary()}.")
     api.launch(server_name="0.0.0.0" if cmd_opts.listen else "127.0.0.1", port=cmd_opts.port if cmd_opts.port else 7861)
@@ -373,10 +373,10 @@ def webui():
             ui_tempdir.cleanup_tmpdr()
             startup_timer.record("cleanup temp dir")
 
-        modules.script_callbacks.before_ui_callback()
+        script_callbacks.before_ui_callback()
         startup_timer.record("scripts before_ui_callback")
 
-        shared.demo = modules.ui.create_ui()
+        shared.demo = ui.create_ui()
         startup_timer.record("create ui")
 
         if not cmd_opts.no_gradio_queue:
@@ -424,15 +424,15 @@ def webui():
 
         setup_middleware(app)
 
-        modules.progress.setup_progress_api(app)
-        modules.ui.setup_ui_api(app)
+        progress.setup_progress_api(app)
+        ui.setup_ui_api(app)
 
         if launch_api:
             create_api(app)
 
         ui_extra_networks.add_pages_to_demo(app)
 
-        modules.script_callbacks.app_started_callback(shared.demo, app)
+        script_callbacks.app_started_callback(shared.demo, app)
         startup_timer.record("scripts app_started_callback")
 
         print(f"Startup time: {startup_timer.summary()}.")
@@ -463,14 +463,14 @@ def webui():
         shared.demo.close()
         time.sleep(0.5)
         startup_timer.reset()
-        modules.script_callbacks.app_reload_callback()
+        script_callbacks.app_reload_callback()
         startup_timer.record("app reload callback")
-        modules.script_callbacks.script_unloaded_callback()
+        script_callbacks.script_unloaded_callback()
         startup_timer.record("scripts unloaded callback")
         initialize_rest(reload_script_modules=True)
 
-        modules.script_callbacks.on_list_optimizers(modules.sd_hijack_optimizations.list_optimizers)
-        modules.sd_hijack.list_optimizers()
+        script_callbacks.on_list_optimizers(sd_hijack_optimizations.list_optimizers)
+        sd_hijack.list_optimizers()
         startup_timer.record("scripts list_optimizers")
 
 
