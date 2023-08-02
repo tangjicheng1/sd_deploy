@@ -84,11 +84,11 @@ def add_paste_fields(tabname, init_img, fields, override_settings_component=None
     paste_fields[tabname] = {"init_img": init_img, "fields": fields, "override_settings_component": override_settings_component}
 
     # backwards compatibility for existing extensions
-    import modules.ui
+    from modules import ui
     if tabname == 'txt2img':
-        modules.ui.txt2img_paste_fields = fields
+        ui.txt2img_paste_fields = fields
     elif tabname == 'img2img':
-        modules.ui.img2img_paste_fields = fields
+        ui.img2img_paste_fields = fields
 
 
 def create_buttons(tabs_list):
