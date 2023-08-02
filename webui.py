@@ -239,7 +239,7 @@ def initialize():
     modelloader.cleanup_models()
     configure_opts_onchange()
 
-    print("[tangjicheng] modules.__file__: {modules.__file__}")
+    print(f"[tangjicheng] modules.__file__: {modules.__file__}")
     modules.sd_models.setup_model()
     startup_timer.record("setup SD model")
 
