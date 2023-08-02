@@ -1,6 +1,6 @@
 import math
 
-import modules.scripts as scripts
+from modules import scripts
 import gradio as gr
 from PIL import Image
 
