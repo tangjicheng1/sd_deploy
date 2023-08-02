@@ -22,3 +22,4 @@ resize-right
 blendmodes
 facexlib
 gfpgan
+gradio==3.31.0
