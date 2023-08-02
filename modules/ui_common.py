@@ -199,9 +199,11 @@ Requested path was: {f}
 
             paste_field_names = []
             if tabname == "txt2img":
-                paste_field_names = modules.scripts.scripts_txt2img.paste_field_names
+                from modules import scripts
+                paste_field_names = scripts.scripts_txt2img.paste_field_names
             elif tabname == "img2img":
-                paste_field_names = modules.scripts.scripts_img2img.paste_field_names
+                from modules import scripts
+                paste_field_names = scripts.scripts_img2img.paste_field_names
 
             for paste_tabname, paste_button in buttons.items():
                 parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
