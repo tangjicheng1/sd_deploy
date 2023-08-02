@@ -2,7 +2,7 @@
 
 def realesrgan_models_names():
     from modules import realesrgan_model
-    return [x.name for x in modules.realesrgan_model.get_realesrgan_models(None)]
+    return [x.name for x in realesrgan_model.get_realesrgan_models(None)]
 
 
 def postprocessing_scripts():
