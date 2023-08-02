@@ -7,9 +7,8 @@ import sys
 import gradio as gr
 import subprocess as sp
 
-from modules import call_queue, shared
-from modules.generation_parameters_copypaste import image_from_url_text
-import modules.images
+from modules import call_queue, shared, generation_parameters_copypaste
+from modules import images as images_module
 
 folder_symbol = '\U0001f4c2'  # 📂
 
@@ -65,12 +64,12 @@ def save_files(js_data, images, do_make_zip, index):
             writer.writerow(["prompt", "seed", "width", "height", "sampler", "cfgs", "steps", "filename", "negative_prompt"])
 
         for image_index, filedata in enumerate(images, start_index):
-            image = image_from_url_text(filedata)
+            image = generation_parameters_copypaste.image_from_url_text(filedata)
 
             is_grid = image_index < p.index_of_first_image
             i = 0 if is_grid else (image_index - p.index_of_first_image)
 
-            fullfn, txt_fullfn = modules.images.save_image(image, path, "", seed=p.all_seeds[i], prompt=p.all_prompts[i], extension=extension, info=p.infotexts[image_index], grid=is_grid, p=p, save_to_dirs=save_to_dirs)
+            fullfn, txt_fullfn = images_module.save_image(image, path, "", seed=p.all_seeds[i], prompt=p.all_prompts[i], extension=extension, info=p.infotexts[image_index], grid=is_grid, p=p, save_to_dirs=save_to_dirs)
 
             filename = os.path.relpath(fullfn, path)
             filenames.append(filename)
