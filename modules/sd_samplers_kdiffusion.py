@@ -2,13 +2,7 @@ from collections import deque
 import torch
 import inspect
 import k_diffusion.sampling
-from modules import prompt_parser, devices, sd_samplers_common
-
-from modules.shared import opts, state
-import modules.shared as shared
-from modules.script_callbacks import CFGDenoiserParams, cfg_denoiser_callback
-from modules.script_callbacks import CFGDenoisedParams, cfg_denoised_callback
-from modules.script_callbacks import AfterCFGCallbackParams, cfg_after_cfg_callback
+from modules import prompt_parser, devices, sd_samplers_common, shared, script_callbacks
 
 samplers_k_diffusion = [
     ('Euler a', 'sample_euler_ancestral', ['k_euler_a', 'k_euler_ancestral'], {"uses_ensd": True}),
@@ -79,7 +73,7 @@ class CFGDenoiser(torch.nn.Module):
         return denoised
 
     def forward(self, x, sigma, uncond, cond, cond_scale, s_min_uncond, image_cond):
-        if state.interrupted or state.skipped:
+        if shared.state.interrupted or shared.state.skipped:
             raise sd_samplers_common.InterruptedException
 
         # at self.image_cfg_scale == 1.0 produced results for edit model are the same as with normal sampling,
@@ -110,8 +104,8 @@ class CFGDenoiser(torch.nn.Module):
             sigma_in = torch.cat([torch.stack([sigma[i] for _ in range(n)]) for i, n in enumerate(repeats)] + [sigma] + [sigma])
             image_cond_in = torch.cat([torch.stack([image_cond[i] for _ in range(n)]) for i, n in enumerate(repeats)] + [image_uncond] + [torch.zeros_like(self.init_latent)])
 
-        denoiser_params = CFGDenoiserParams(x_in, image_cond_in, sigma_in, state.sampling_step, state.sampling_steps, tensor, uncond)
-        cfg_denoiser_callback(denoiser_params)
+        denoiser_params = script_callbacks.CFGDenoiserParams(x_in, image_cond_in, sigma_in, shared.state.sampling_step, shared.state.sampling_steps, tensor, uncond)
+        script_callbacks.cfg_denoiser_callback(denoiser_params)
         x_in = denoiser_params.x
         image_cond_in = denoiser_params.image_cond
         sigma_in = denoiser_params.sigma
@@ -163,14 +157,14 @@ class CFGDenoiser(torch.nn.Module):
             fake_uncond = torch.cat([x_out[i:i+1] for i in denoised_image_indexes])
             x_out = torch.cat([x_out, fake_uncond])  # we skipped uncond denoising, so we put cond-denoised image to where the uncond-denoised image should be
 
-        denoised_params = CFGDenoisedParams(x_out, state.sampling_step, state.sampling_steps, self.inner_model)
-        cfg_denoised_callback(denoised_params)
+        denoised_params = script_callbacks.CFGDenoisedParams(x_out, shared.state.sampling_step, shared.state.sampling_steps, self.inner_model)
+        script_callbacks.cfg_denoised_callback(denoised_params)
 
         devices.test_for_nans(x_out, "unet")
 
-        if opts.live_preview_content == "Prompt":
+        if shared.opts.live_preview_content == "Prompt":
             sd_samplers_common.store_latent(torch.cat([x_out[i:i+1] for i in denoised_image_indexes]))
-        elif opts.live_preview_content == "Negative prompt":
+        elif shared.opts.live_preview_content == "Negative prompt":
             sd_samplers_common.store_latent(x_out[-uncond.shape[0]:])
 
         if is_edit_model:
@@ -183,8 +177,8 @@ class CFGDenoiser(torch.nn.Module):
         if self.mask is not None:
             denoised = self.init_latent * self.mask + self.nmask * denoised
 
-        after_cfg_callback_params = AfterCFGCallbackParams(denoised, state.sampling_step, state.sampling_steps)
-        cfg_after_cfg_callback(after_cfg_callback_params)
+        after_cfg_callback_params = script_callbacks.AfterCFGCallbackParams(denoised, shared.state.sampling_step, shared.state.sampling_steps)
+        script_callbacks.cfg_after_cfg_callback(after_cfg_callback_params)
         denoised = after_cfg_callback_params.x
 
         self.step += 1
@@ -212,7 +206,7 @@ class TorchHijack:
             if noise.shape == x.shape:
                 return noise
 
-        if opts.randn_source == "CPU" or x.device.type == 'mps':
+        if shared.opts.randn_source == "CPU" or x.device.type == 'mps':
             return torch.randn_like(x, device=devices.cpu).to(x.device)
         else:
             return torch.randn_like(x)
@@ -239,19 +233,19 @@ class KDiffusionSampler:
     def callback_state(self, d):
         step = d['i']
         latent = d["denoised"]
-        if opts.live_preview_content == "Combined":
+        if shared.opts.live_preview_content == "Combined":
             sd_samplers_common.store_latent(latent)
         self.last_latent = latent
 
         if self.stop_at is not None and step > self.stop_at:
             raise sd_samplers_common.InterruptedException
 
-        state.sampling_step = step
+        shared.state.sampling_step = step
         shared.total_tqdm.update()
 
     def launch_sampling(self, steps, func):
-        state.sampling_steps = steps
-        state.sampling_step = 0
+        shared.state.sampling_steps = steps
+        shared.state.sampling_step = 0
 
         try:
             return func()
@@ -266,7 +260,7 @@ class KDiffusionSampler:
         self.model_wrap_cfg.nmask = p.nmask if hasattr(p, 'nmask') else None
         self.model_wrap_cfg.step = 0
         self.model_wrap_cfg.image_cfg_scale = getattr(p, 'image_cfg_scale', None)
-        self.eta = p.eta if p.eta is not None else opts.eta_ancestral
+        self.eta = p.eta if p.eta is not None else shared.opts.eta_ancestral
         self.s_min_uncond = getattr(p, 's_min_uncond', 0.0)
 
         k_diffusion.sampling.torch = TorchHijack(self.sampler_noises if self.sampler_noises is not None else [])
@@ -286,7 +280,7 @@ class KDiffusionSampler:
 
     def get_sigmas(self, p, steps):
         discard_next_to_last_sigma = self.config is not None and self.config.options.get('discard_next_to_last_sigma', False)
-        if opts.always_discard_next_to_last_sigma and not discard_next_to_last_sigma:
+        if shared.opts.always_discard_next_to_last_sigma and not discard_next_to_last_sigma:
             discard_next_to_last_sigma = True
             p.extra_generation_params["Discard penultimate sigma"] = True
 
@@ -295,7 +289,7 @@ class KDiffusionSampler:
         if p.sampler_noise_scheduler_override:
             sigmas = p.sampler_noise_scheduler_override(steps)
         elif self.config is not None and self.config.options.get('scheduler', None) == 'karras':
-            sigma_min, sigma_max = (0.1, 10) if opts.use_old_karras_scheduler_sigmas else (self.model_wrap.sigmas[0].item(), self.model_wrap.sigmas[-1].item())
+            sigma_min, sigma_max = (0.1, 10) if shared.opts.use_old_karras_scheduler_sigmas else (self.model_wrap.sigmas[0].item(), self.model_wrap.sigmas[-1].item())
 
             sigmas = k_diffusion.sampling.get_sigmas_karras(n=steps, sigma_min=sigma_min, sigma_max=sigma_max, device=shared.device)
         else:
