@@ -64,16 +64,16 @@ from modules import progress
 
 from modules import ui
 from modules import modelloader
-from modules.shared import cmd_opts
+from modules import shared
 from modules.hypernetworks import hypernetwork
 
 startup_timer.record("other imports")
 
 
-if cmd_opts.server_name:
-    server_name = cmd_opts.server_name
+if shared.cmd_opts.server_name:
+    server_name = shared.cmd_opts.server_name
 else:
-    server_name = "0.0.0.0" if cmd_opts.listen else None
+    server_name = "0.0.0.0" if shared.cmd_opts.listen else None
 
 
 def fix_asyncio_event_loop_policy():
@@ -166,16 +166,16 @@ def restore_config_state_file():
 
 
 def validate_tls_options():
-    if not (cmd_opts.tls_keyfile and cmd_opts.tls_certfile):
+    if not (shared.cmd_opts.tls_keyfile and shared.cmd_opts.tls_certfile):
         return
 
     try:
-        if not os.path.exists(cmd_opts.tls_keyfile):
+        if not os.path.exists(shared.cmd_opts.tls_keyfile):
             print("Invalid path to TLS keyfile given")
-        if not os.path.exists(cmd_opts.tls_certfile):
-            print(f"Invalid path to TLS certfile: '{cmd_opts.tls_certfile}'")
+        if not os.path.exists(shared.cmd_opts.tls_certfile):
+            print(f"Invalid path to TLS certfile: '{shared.cmd_opts.tls_certfile}'")
     except TypeError:
-        cmd_opts.tls_keyfile = cmd_opts.tls_certfile = None
+        shared.cmd_opts.tls_keyfile = shared.cmd_opts.tls_certfile = None
         print("TLS setup invalid, running webui without TLS")
     else:
         print("Running with TLS")
@@ -193,14 +193,14 @@ def get_gradio_auth_creds() -> Iterable[tuple[str, ...]]:
             return None
         return tuple(s.split(':', 1))
 
-    if cmd_opts.gradio_auth:
-        for cred in cmd_opts.gradio_auth.split(','):
+    if shared.cmd_opts.gradio_auth:
+        for cred in shared.cmd_opts.gradio_auth.split(','):
             cred = process_credential_line(cred)
             if cred:
                 yield cred
 
-    if cmd_opts.gradio_auth_path:
-        with open(cmd_opts.gradio_auth_path, 'r', encoding="utf8") as file:
+    if shared.cmd_opts.gradio_auth_path:
+        with open(shared.cmd_opts.gradio_auth_path, 'r', encoding="utf8") as file:
             for line in file.readlines():
                 for cred in line.strip().split(','):
                     cred = process_credential_line(cred)
@@ -241,10 +241,10 @@ def initialize():
     sd_models.setup_model()
     startup_timer.record("setup SD model")
 
-    codeformer.setup_model(cmd_opts.codeformer_models_path)
+    codeformer.setup_model(shared.cmd_opts.codeformer_models_path)
     startup_timer.record("setup codeformer")
 
-    gfpgan.setup_model(cmd_opts.gfpgan_models_path)
+    gfpgan.setup_model(shared.cmd_opts.gfpgan_models_path)
     startup_timer.record("setup gfpgan")
 
     initialize_rest(reload_script_modules=False)
@@ -260,7 +260,7 @@ def initialize_rest(*, reload_script_modules=False):
 
     restore_config_state_file()
 
-    if cmd_opts.ui_debug_mode:
+    if shared.cmd_opts.ui_debug_mode:
         shared.sd_upscalers = upscaler.UpscalerLanczos().scalers
         scripts.load_scripts()
         return
@@ -268,7 +268,7 @@ def initialize_rest(*, reload_script_modules=False):
     sd_models.list_models()
     startup_timer.record("list SD models")
 
-    localization.list_localizations(cmd_opts.localizations_dir)
+    localization.list_localizations(shared.cmd_opts.localizations_dir)
 
     scripts.load_scripts()
     startup_timer.record("load scripts")
@@ -329,10 +329,10 @@ def configure_cors_middleware(app):
         "allow_headers": ["*"],
         "allow_credentials": True,
     }
-    if cmd_opts.cors_allow_origins:
-        cors_options["allow_origins"] = cmd_opts.cors_allow_origins.split(',')
-    if cmd_opts.cors_allow_origins_regex:
-        cors_options["allow_origin_regex"] = cmd_opts.cors_allow_origins_regex
+    if shared.cmd_opts.cors_allow_origins:
+        cors_options["allow_origins"] = shared.cmd_opts.cors_allow_origins.split(',')
+    if shared.cmd_opts.cors_allow_origins_regex:
+        cors_options["allow_origin_regex"] = shared.cmd_opts.cors_allow_origins_regex
     app.add_middleware(CORSMiddleware, **cors_options)
 
 
@@ -352,7 +352,7 @@ def api_only():
     script_callbacks.app_started_callback(None, app)
 
     print(f"Startup time: {startup_timer.summary()}.")
-    api.launch(server_name="0.0.0.0" if cmd_opts.listen else "127.0.0.1", port=cmd_opts.port if cmd_opts.port else 7861)
+    api.launch(server_name="0.0.0.0" if shared.cmd_opts.listen else "127.0.0.1", port=shared.cmd_opts.port if shared.cmd_opts.port else 7861)
 
 
 def stop_route(request):
@@ -375,7 +375,7 @@ def webui():
         shared.demo = ui.create_ui()
         startup_timer.record("create ui")
 
-        if not cmd_opts.no_gradio_queue:
+        if not shared.cmd_opts.no_gradio_queue:
             shared.demo.queue(64)
 
         gradio_auth_creds = list(get_gradio_auth_creds()) or None
@@ -392,23 +392,23 @@ def webui():
             FastAPI.setup = fastapi_setup
 
         app, local_url, share_url = shared.demo.launch(
-            share=cmd_opts.share,
+            share=shared.cmd_opts.share,
             server_name=server_name,
-            server_port=cmd_opts.port,
-            ssl_keyfile=cmd_opts.tls_keyfile,
-            ssl_certfile=cmd_opts.tls_certfile,
-            ssl_verify=cmd_opts.disable_tls_verify,
-            debug=cmd_opts.gradio_debug,
+            server_port=shared.cmd_opts.port,
+            ssl_keyfile=shared.cmd_opts.tls_keyfile,
+            ssl_certfile=shared.cmd_opts.tls_certfile,
+            ssl_verify=shared.cmd_opts.disable_tls_verify,
+            debug=shared.cmd_opts.gradio_debug,
             auth=gradio_auth_creds,
-            inbrowser=cmd_opts.autolaunch,
+            inbrowser=shared.cmd_opts.autolaunch,
             prevent_thread_lock=True,
-            allowed_paths=cmd_opts.gradio_allowed_path,
+            allowed_paths=shared.cmd_opts.gradio_allowed_path,
         )
-        if cmd_opts.add_stop_route:
+        if shared.cmd_opts.add_stop_route:
             app.add_route("/_stop", stop_route, methods=["POST"])
 
         # after initial launch, disable --autolaunch for subsequent restarts
-        cmd_opts.autolaunch = False
+        shared.cmd_opts.autolaunch = False
 
         startup_timer.record("gradio launch")
 
@@ -433,10 +433,10 @@ def webui():
 
         print(f"Startup time: {startup_timer.summary()}.")
 
-        if cmd_opts.subpath:
+        if shared.cmd_opts.subpath:
             redirector = FastAPI()
             redirector.get("/")
-            gradio.mount_gradio_app(redirector, shared.demo, path=f"/{cmd_opts.subpath}")
+            gradio.mount_gradio_app(redirector, shared.demo, path=f"/{shared.cmd_opts.subpath}")
 
         try:
             while True:
@@ -471,7 +471,7 @@ def webui():
 
 
 if __name__ == "__main__":
-    if cmd_opts.nowebui:
+    if shared.cmd_opts.nowebui:
         api_only()
     else:
         webui()
