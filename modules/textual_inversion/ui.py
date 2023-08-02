@@ -2,13 +2,13 @@ import html
 
 import gradio as gr
 
-import modules.textual_inversion.textual_inversion
-import modules.textual_inversion.preprocess
+from modules.textual_inversion import textual_inversion
+from modules.textual_inversion import preprocess as preprocess_module
 from modules import sd_hijack, shared
 
 
 def create_embedding(name, initialization_text, nvpt, overwrite_old):
-    filename = modules.textual_inversion.textual_inversion.create_embedding(name, nvpt, overwrite_old, init_text=initialization_text)
+    filename = textual_inversion.create_embedding(name, nvpt, overwrite_old, init_text=initialization_text)
 
     sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings()
 
@@ -16,7 +16,7 @@ def create_embedding(name, initialization_text, nvpt, overwrite_old):
 
 
 def preprocess(*args):
-    modules.textual_inversion.preprocess.preprocess(*args)
+    preprocess_module.preprocess(*args)
 
     return f"Preprocessing {'interrupted' if shared.state.interrupted else 'finished'}.", ""
 
@@ -30,7 +30,7 @@ def train_embedding(*args):
         if not apply_optimizations:
             sd_hijack.undo_optimizations()
 
-        embedding, filename = modules.textual_inversion.textual_inversion.train_embedding(*args)
+        embedding, filename = textual_inversion.train_embedding(*args)
 
         res = f"""
 Training {'interrupted' if shared.state.interrupted else 'finished'} at {embedding.step} steps.
