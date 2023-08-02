@@ -22,4 +22,6 @@ resize-right
 blendmodes
 facexlib
 gfpgan
+realesrgan
 gradio==3.31.0
+pydantic==1.10.12
