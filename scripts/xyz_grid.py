@@ -6,20 +6,10 @@ import csv
 from io import StringIO
 from PIL import Image
 import numpy as np
-
-import modules.scripts as scripts
 import gradio as gr
-
-from modules import images, sd_samplers, processing, sd_models, sd_vae
-from modules.processing import process_images, Processed, StableDiffusionProcessingTxt2Img
-from modules.shared import opts, state
-import modules.shared as shared
-import modules.sd_samplers
-import modules.sd_models
-import modules.sd_vae
 import re
 
-from modules.ui_components import ToolButton
+from modules import images, sd_samplers, processing, sd_models, sd_vae, scripts, shared, ui_components
 
 fill_values_symbol = "\U0001f4d2"  # 📒
 
@@ -81,7 +71,7 @@ def confirm_samplers(p, xs):
 
 
 def apply_checkpoint(p, x, xs):
-    info = modules.sd_models.get_closet_checkpoint_match(x)
+    info = sd_models.get_closet_checkpoint_match(x)
     if info is None:
         raise RuntimeError(f"Unknown checkpoint: {x}")
     p.override_settings['sd_model_checkpoint'] = info.name
@@ -89,45 +79,45 @@ def apply_checkpoint(p, x, xs):
 
 def confirm_checkpoints(p, xs):
     for x in xs:
-        if modules.sd_models.get_closet_checkpoint_match(x) is None:
+        if sd_models.get_closet_checkpoint_match(x) is None:
             raise RuntimeError(f"Unknown checkpoint: {x}")
 
 
 def apply_clip_skip(p, x, xs):
-    opts.data["CLIP_stop_at_last_layers"] = x
+    shared.opts.data["CLIP_stop_at_last_layers"] = x
 
 
 def apply_upscale_latent_space(p, x, xs):
     if x.lower().strip() != '0':
-        opts.data["use_scale_latent_for_hires_fix"] = True
+        shared.opts.data["use_scale_latent_for_hires_fix"] = True
     else:
-        opts.data["use_scale_latent_for_hires_fix"] = False
+        shared.opts.data["use_scale_latent_for_hires_fix"] = False
 
 
 def find_vae(name: str):
     if name.lower() in ['auto', 'automatic']:
-        return modules.sd_vae.unspecified
+        return sd_vae.unspecified
     if name.lower() == 'none':
         return None
     else:
-        choices = [x for x in sorted(modules.sd_vae.vae_dict, key=lambda x: len(x)) if name.lower().strip() in x.lower()]
+        choices = [x for x in sorted(sd_vae.vae_dict, key=lambda x: len(x)) if name.lower().strip() in x.lower()]
         if len(choices) == 0:
             print(f"No VAE found for {name}; using automatic")
-            return modules.sd_vae.unspecified
+            return sd_vae.unspecified
         else:
-            return modules.sd_vae.vae_dict[choices[0]]
+            return sd_vae.vae_dict[choices[0]]
 
 
 def apply_vae(p, x, xs):
-    modules.sd_vae.reload_vae_weights(shared.sd_model, vae_file=find_vae(x))
+    sd_vae.reload_vae_weights(shared.sd_model, vae_file=find_vae(x))
 
 
-def apply_styles(p: StableDiffusionProcessingTxt2Img, x: str, _):
+def apply_styles(p: processing.StableDiffusionProcessingTxt2Img, x: str, _):
     p.styles.extend(x.split(','))
 
 
 def apply_uni_pc_order(p, x, xs):
-    opts.data["uni_pc_order"] = min(x, p.steps - 1)
+    shared.opts.data["uni_pc_order"] = min(x, p.steps - 1)
 
 
 def apply_face_restore(p, opt, x):
@@ -243,7 +233,7 @@ def draw_xyz_grid(p, xs, ys, zs, x_labels, y_labels, z_labels, cell, draw_legend
 
     processed_result = None
 
-    state.job_count = list_size * p.n_iter
+    shared.state.job_count = list_size * p.n_iter
 
     def process_cell(x, y, z, ix, iy, iz):
         nonlocal processed_result
@@ -251,9 +241,9 @@ def draw_xyz_grid(p, xs, ys, zs, x_labels, y_labels, z_labels, cell, draw_legend
         def index(ix, iy, iz):
             return ix + iy * len(xs) + iz * len(xs) * len(ys)
 
-        state.job = f"{index(ix, iy, iz) + 1} out of {list_size}"
+        shared.state.job = f"{index(ix, iy, iz) + 1} out of {list_size}"
 
-        processed: Processed = cell(x, y, z, ix, iy, iz)
+        processed: processing.Processed = cell(x, y, z, ix, iy, iz)
 
         if processed_result is None:
             # Use our first processed result object as a template container to hold our full results
@@ -315,10 +305,10 @@ def draw_xyz_grid(p, xs, ys, zs, x_labels, y_labels, z_labels, cell, draw_legend
     if not processed_result:
         # Should never happen, I've only seen it on one of four open tabs and it needed to refresh.
         print("Unexpected error: Processing could not begin, you may need to refresh the tab or restart the service.")
-        return Processed(p, [])
+        return processing.Processed(p, [])
     elif not any(processed_result.images):
         print("Unexpected error: draw_xyz_grid failed to return even a single processed image")
-        return Processed(p, [])
+        return processing.Processed(p, [])
 
     z_count = len(zs)
 
@@ -348,17 +338,17 @@ def draw_xyz_grid(p, xs, ys, zs, x_labels, y_labels, z_labels, cell, draw_legend
 
 class SharedSettingsStackHelper(object):
     def __enter__(self):
-        self.CLIP_stop_at_last_layers = opts.CLIP_stop_at_last_layers
-        self.vae = opts.sd_vae
-        self.uni_pc_order = opts.uni_pc_order
+        self.CLIP_stop_at_last_layers = shared.opts.CLIP_stop_at_last_layers
+        self.vae = shared.opts.sd_vae
+        self.uni_pc_order = shared.opts.uni_pc_order
 
     def __exit__(self, exc_type, exc_value, tb):
-        opts.data["sd_vae"] = self.vae
-        opts.data["uni_pc_order"] = self.uni_pc_order
-        modules.sd_models.reload_model_weights()
-        modules.sd_vae.reload_vae_weights()
+        shared.opts.data["sd_vae"] = self.vae
+        shared.opts.data["uni_pc_order"] = self.uni_pc_order
+        sd_models.reload_model_weights()
+        sd_vae.reload_vae_weights()
 
-        opts.data["CLIP_stop_at_last_layers"] = self.CLIP_stop_at_last_layers
+        shared.opts.data["CLIP_stop_at_last_layers"] = self.CLIP_stop_at_last_layers
 
 
 re_range = re.compile(r"\s*([+-]?\s*\d+)\s*-\s*([+-]?\s*\d+)(?:\s*\(([+-]\d+)\s*\))?\s*")
@@ -381,19 +371,19 @@ class Script(scripts.Script):
                     x_type = gr.Dropdown(label="X type", choices=[x.label for x in self.current_axis_options], value=self.current_axis_options[1].label, type="index", elem_id=self.elem_id("x_type"))
                     x_values = gr.Textbox(label="X values", lines=1, elem_id=self.elem_id("x_values"))
                     x_values_dropdown = gr.Dropdown(label="X values",visible=False,multiselect=True,interactive=True)
-                    fill_x_button = ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_x_tool_button", visible=False)
+                    fill_x_button = ui_components.ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_x_tool_button", visible=False)
 
                 with gr.Row():
                     y_type = gr.Dropdown(label="Y type", choices=[x.label for x in self.current_axis_options], value=self.current_axis_options[0].label, type="index", elem_id=self.elem_id("y_type"))
                     y_values = gr.Textbox(label="Y values", lines=1, elem_id=self.elem_id("y_values"))
                     y_values_dropdown = gr.Dropdown(label="Y values",visible=False,multiselect=True,interactive=True)
-                    fill_y_button = ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_y_tool_button", visible=False)
+                    fill_y_button = ui_components.ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_y_tool_button", visible=False)
 
                 with gr.Row():
                     z_type = gr.Dropdown(label="Z type", choices=[x.label for x in self.current_axis_options], value=self.current_axis_options[0].label, type="index", elem_id=self.elem_id("z_type"))
                     z_values = gr.Textbox(label="Z values", lines=1, elem_id=self.elem_id("z_values"))
                     z_values_dropdown = gr.Dropdown(label="Z values",visible=False,multiselect=True,interactive=True)
-                    fill_z_button = ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_z_tool_button", visible=False)
+                    fill_z_button = ui_components.ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_z_tool_button", visible=False)
 
         with gr.Row(variant="compact", elem_id="axis_options"):
             with gr.Column():
@@ -467,7 +457,7 @@ class Script(scripts.Script):
         if not no_fixed_seeds:
             modules.processing.fix_seed(p)
 
-        if not opts.return_grid:
+        if not shared.opts.return_grid:
             p.batch_size = 1
 
         def process_axis(opt, vals, vals_dropdown):
@@ -552,7 +542,7 @@ class Script(scripts.Script):
         # this could be moved to common code, but unlikely to be ever triggered anywhere else
         Image.MAX_IMAGE_PIXELS = None # disable check in Pillow and rely on check below to allow large custom image sizes
         grid_mp = round(len(xs) * len(ys) * len(zs) * p.width * p.height / 1000000)
-        assert grid_mp < opts.img_max_size_mp, f'Error: Resulting grid would be too large ({grid_mp} MPixels) (max configured size is {opts.img_max_size_mp} MPixels)'
+        assert grid_mp < shared.opts.img_max_size_mp, f'Error: Resulting grid would be too large ({grid_mp} MPixels) (max configured size is {shared.opts.img_max_size_mp} MPixels)'
 
         def fix_axis_seeds(axis_opt, axis_list):
             if axis_opt.label in ['Seed', 'Var. seed']:
@@ -574,7 +564,7 @@ class Script(scripts.Script):
         else:
             total_steps = p.steps * len(xs) * len(ys) * len(zs)
 
-        if isinstance(p, StableDiffusionProcessingTxt2Img) and p.enable_hr:
+        if isinstance(p, processing.StableDiffusionProcessingTxt2Img) and p.enable_hr:
             if x_opt.label == "Hires steps":
                 total_steps += sum(xs) * len(ys) * len(zs)
             elif y_opt.label == "Hires steps":
@@ -594,9 +584,9 @@ class Script(scripts.Script):
         print(f"X/Y/Z plot will create {len(xs) * len(ys) * len(zs) * image_cell_count} images on {len(zs)} {len(xs)}x{len(ys)} grid{plural_s}{cell_console_text}. (Total steps to process: {total_steps})")
         shared.total_tqdm.updateTotal(total_steps)
 
-        state.xyz_plot_x = AxisInfo(x_opt, xs)
-        state.xyz_plot_y = AxisInfo(y_opt, ys)
-        state.xyz_plot_z = AxisInfo(z_opt, zs)
+        shared.state.xyz_plot_x = AxisInfo(x_opt, xs)
+        shared.state.xyz_plot_y = AxisInfo(y_opt, ys)
+        shared.state.xyz_plot_z = AxisInfo(z_opt, zs)
 
         # If one of the axes is very slow to change between (like SD model
         # checkpoint), then make sure it is in the outer iteration of the nested
@@ -626,7 +616,7 @@ class Script(scripts.Script):
 
         def cell(x, y, z, ix, iy, iz):
             if shared.state.interrupted:
-                return Processed(p, [], p.seed, "")
+                return processing.Processed(p, [], p.seed, "")
 
             pc = copy(p)
             pc.styles = pc.styles[:]
@@ -634,7 +624,7 @@ class Script(scripts.Script):
             y_opt.apply(pc, y, ys)
             z_opt.apply(pc, z, zs)
 
-            res = process_images(pc)
+            res = processing.process_images(pc)
 
             # Sets subgrid infotexts
             subgrid_index = 1 + iz
@@ -701,13 +691,13 @@ class Script(scripts.Script):
             # Don't need sub-images anymore, drop from list:
             processed.images = processed.images[:z_count+1]
 
-        if opts.grid_save:
+        if shared.opts.grid_save:
             # Auto-save main and sub-grids:
             grid_count = z_count + 1 if z_count > 1 else 1
             for g in range(grid_count):
                 #TODO: See previous comment about intentional data misalignment.
                 adj_g = g-1 if g > 0 else g
-                images.save_image(processed.images[g], p.outpath_grids, "xyz_grid", info=processed.infotexts[g], extension=opts.grid_format, prompt=processed.all_prompts[adj_g], seed=processed.all_seeds[adj_g], grid=True, p=processed)
+                images.save_image(processed.images[g], p.outpath_grids, "xyz_grid", info=processed.infotexts[g], extension=shared.opts.grid_format, prompt=processed.all_prompts[adj_g], seed=processed.all_seeds[adj_g], grid=True, p=processed)
 
         if not include_sub_grids:
             # Done with sub-grids, drop all related information:
