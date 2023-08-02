@@ -9,9 +9,7 @@ import piexif
 import piexif.helper
 import gradio as gr
 
-import modules
-import modules.shared as shared
-from modules import scripts, script_callbacks, extensions
+from modules import scripts, script_callbacks, extensions, shared, ui
 from modules.shared import opts
 from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
 from modules.call_queue import queue_lock
@@ -86,7 +84,7 @@ def get_default_args(script_runner):
 def simple_txt2img(args: Dict):
     webui.initialize()
     script_callbacks.before_ui_callback()
-    shared.demo = modules.ui.create_ui()
+    shared.demo = ui.create_ui()
 
     ext_name = [iter.name for iter in extensions.extensions]
     print("[tangjicheng] extentions: ", ext_name)
