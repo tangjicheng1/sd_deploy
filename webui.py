@@ -20,7 +20,7 @@ import logging
 
 logging.getLogger("xformers").addFilter(lambda record: 'A matching Triton is not available' not in record.getMessage())
 
-from modules import paths, timer, import_hook, errors  # noqa: F401
+from modules import sd_models, paths, timer, import_hook, errors  # noqa: F401
 
 startup_timer = timer.Timer()
 
@@ -56,7 +56,6 @@ import modules.lowvram
 import modules.scripts
 import modules.sd_hijack
 import modules.sd_hijack_optimizations
-import modules.sd_models
 import modules.sd_vae
 import modules.txt2img
 import modules.script_callbacks
@@ -222,7 +221,7 @@ def configure_sigint_handler():
 
 
 def configure_opts_onchange():
-    shared.opts.onchange("sd_model_checkpoint", wrap_queued_call(lambda: modules.sd_models.reload_model_weights()), call=False)
+    shared.opts.onchange("sd_model_checkpoint", wrap_queued_call(lambda: sd_models.reload_model_weights()), call=False)
     shared.opts.onchange("sd_vae", wrap_queued_call(lambda: modules.sd_vae.reload_vae_weights()), call=False)
     shared.opts.onchange("sd_vae_as_default", wrap_queued_call(lambda: modules.sd_vae.reload_vae_weights()), call=False)
     shared.opts.onchange("temp_dir", ui_tempdir.on_tmpdir_changed)
@@ -243,7 +242,7 @@ def initialize():
     import inspect
     print(f"[tangjicheng] modules.__file__: {inspect.getfile(modules)}")
 
-    modules.sd_models.setup_model()
+    sd_models.setup_model()
     startup_timer.record("setup SD model")
 
     codeformer.setup_model(cmd_opts.codeformer_models_path)
@@ -270,7 +269,7 @@ def initialize_rest(*, reload_script_modules=False):
         modules.scripts.load_scripts()
         return
 
-    modules.sd_models.list_models()
+    sd_models.list_models()
     startup_timer.record("list SD models")
 
     localization.list_localizations(cmd_opts.localizations_dir)
