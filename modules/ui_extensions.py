@@ -15,7 +15,8 @@ import errno
 
 from modules import extensions, shared, paths, config_states
 from modules.paths_internal import config_states_dir
-from modules.call_queue import wrap_gradio_gpu_call
+from modules import call_queue
+from modules import ui as ui_module
 
 available_extensions = {"extensions": []}
 STYLE_PRIMARY = ' style="color: var(--primary-400)"'
@@ -495,8 +496,6 @@ def preload_extensions_git_metadata():
 
 
 def create_ui():
-    import modules.ui
-
     config_states.list_config_states()
 
     threading.Thread(target=preload_extensions_git_metadata).start()
@@ -531,7 +530,7 @@ def create_ui():
                 )
 
                 check.click(
-                    fn=wrap_gradio_gpu_call(check_updates, extra_outputs=[gr.update()]),
+                    fn=call_queue.wrap_gradio_gpu_call(check_updates, extra_outputs=[gr.update()]),
                     _js="extensions_check",
                     inputs=[info, extensions_disabled_list],
                     outputs=[extensions_table, info],
@@ -555,31 +554,31 @@ def create_ui():
                 available_extensions_table = gr.HTML()
 
                 refresh_available_extensions_button.click(
-                    fn=modules.ui.wrap_gradio_call(refresh_available_extensions, extra_outputs=[gr.update(), gr.update(), gr.update()]),
+                    fn=call_queue.wrap_gradio_call(refresh_available_extensions, extra_outputs=[gr.update(), gr.update(), gr.update()]),
                     inputs=[available_extensions_index, hide_tags, sort_column],
                     outputs=[available_extensions_index, available_extensions_table, hide_tags, install_result, search_extensions_text],
                 )
 
                 install_extension_button.click(
-                    fn=modules.ui.wrap_gradio_call(install_extension_from_index, extra_outputs=[gr.update(), gr.update()]),
+                    fn=call_queue.wrap_gradio_call(install_extension_from_index, extra_outputs=[gr.update(), gr.update()]),
                     inputs=[extension_to_install, hide_tags, sort_column, search_extensions_text],
                     outputs=[available_extensions_table, extensions_table, install_result],
                 )
 
                 search_extensions_text.change(
-                    fn=modules.ui.wrap_gradio_call(search_extensions, extra_outputs=[gr.update()]),
+                    fn=call_queue.wrap_gradio_call(search_extensions, extra_outputs=[gr.update()]),
                     inputs=[search_extensions_text, hide_tags, sort_column],
                     outputs=[available_extensions_table, install_result],
                 )
 
                 hide_tags.change(
-                    fn=modules.ui.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
+                    fn=call_queue.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
                     inputs=[hide_tags, sort_column, search_extensions_text],
                     outputs=[available_extensions_table, install_result]
                 )
 
                 sort_column.change(
-                    fn=modules.ui.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
+                    fn=call_queue.wrap_gradio_call(refresh_available_extensions_for_tags, extra_outputs=[gr.update()]),
                     inputs=[hide_tags, sort_column, search_extensions_text],
                     outputs=[available_extensions_table, install_result]
                 )
@@ -592,7 +591,7 @@ def create_ui():
                 install_result = gr.HTML(elem_id="extension_install_result")
 
                 install_button.click(
-                    fn=modules.ui.wrap_gradio_call(lambda *args: [gr.update(), *install_extension_from_url(*args)], extra_outputs=[gr.update(), gr.update()]),
+                    fn=call_queue.wrap_gradio_call(lambda *args: [gr.update(), *install_extension_from_url(*args)], extra_outputs=[gr.update(), gr.update()]),
                     inputs=[install_dirname, install_url, install_branch],
                     outputs=[install_url, extensions_table, install_result],
                 )
@@ -600,7 +599,7 @@ def create_ui():
             with gr.TabItem("Backup/Restore"):
                 with gr.Row(elem_id="extensions_backup_top_row"):
                     config_states_list = gr.Dropdown(label="Saved Configs", elem_id="extension_backup_saved_configs", value="Current", choices=["Current"] + list(config_states.all_config_states.keys()))
-                    modules.ui.create_refresh_button(config_states_list, config_states.list_config_states, lambda: {"choices": ["Current"] + list(config_states.all_config_states.keys())}, "refresh_config_states")
+                    ui_module.create_refresh_button(config_states_list, config_states.list_config_states, lambda: {"choices": ["Current"] + list(config_states.all_config_states.keys())}, "refresh_config_states")
                     config_restore_type = gr.Radio(label="State to restore", choices=["extensions", "webui", "both"], value="extensions", elem_id="extension_backup_restore_type")
                     config_restore_button = gr.Button(value="Restore Selected Config", variant="primary", elem_id="extension_backup_restore")
                 with gr.Row(elem_id="extensions_backup_top_row2"):
