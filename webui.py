@@ -59,13 +59,13 @@ from modules import sd_hijack_optimizations
 from modules import sd_vae
 from modules import txt2img
 from modules import script_callbacks
-import modules.textual_inversion.textual_inversion
+from modules.textual_inversion import textual_inversion
 from modules import progress
 
 from modules import ui
 from modules import modelloader
 from modules.shared import cmd_opts
-import modules.hypernetworks.hypernetwork
+from modules.hypernetworks import hypernetwork
 
 startup_timer.record("other imports")
 
@@ -287,7 +287,7 @@ def initialize_rest(*, reload_script_modules=False):
 
     sd_vae.refresh_vae_list()
     startup_timer.record("refresh VAE")
-    modules.textual_inversion.textual_inversion.list_textual_inversion_templates()
+    textual_inversion.list_textual_inversion_templates()
     startup_timer.record("refresh textual inversion templates")
 
     script_callbacks.on_list_optimizers(sd_hijack_optimizations.list_optimizers)
