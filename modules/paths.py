@@ -23,11 +23,10 @@ if sd_path is None:
 BLIP_path = os.path.join(script_path, 'repositories/BLIP')
 
 path_dirs = [
-    # (sd_path, 'ldm', 'Stable Diffusion', []),
     (os.path.join(BLIP_path, '../taming-transformers'), 'taming', 'Taming Transformers', []),
     (os.path.join(BLIP_path, '../CodeFormer'), 'inference_codeformer.py', 'CodeFormer', []),
     (os.path.join(BLIP_path, '../BLIP'), 'models/blip.py', 'BLIP', []),
-    (os.path.join(BLIP_path, '../k-diffusion'), 'k_diffusion/sampling.py', 'k_diffusion', ["atstart"]),
+    # (os.path.join(BLIP_path, '../k-diffusion'), 'k_diffusion/sampling.py', 'k_diffusion', ["atstart"]),
 ]
 
 print(f"[tangjicheng] sd_path: {sd_path}")
