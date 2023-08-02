@@ -6,7 +6,7 @@ from PIL import Image
 from mlflow.models.signature import ModelSignature
 from mlflow.types import DataType, Schema, ColSpec, TensorSpec
 
-from webui_wrapper import simple_txt2img_test
+import webui_wrapper
 
 mlflow.set_experiment("/Users/tang.j@ctw.inc/sd0728")
 
@@ -16,7 +16,7 @@ class StableDiffusion(mlflow.pyfunc.PythonModel):
     pass
 
   def predict(self, context, input):
-    output = simple_txt2img_test(input["input"][0])
+    output = webui_wrapper.simple_txt2img_test(input["input"][0])
     return output
 
 
