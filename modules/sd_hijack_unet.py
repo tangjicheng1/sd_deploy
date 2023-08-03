@@ -1,8 +1,8 @@
 import torch
 from packaging import version
 
-from modules import devices
-from modules.sd_hijack_utils import CondFunc
+from . import devices
+from .sd_hijack_utils import CondFunc
 
 
 class TorchHijackForUnet:

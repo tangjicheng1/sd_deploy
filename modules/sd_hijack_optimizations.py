@@ -10,8 +10,8 @@ from torch import einsum
 from ldm.util import default
 from einops import rearrange
 
-from modules import shared, errors, devices, sub_quadratic_attention
-from modules.hypernetworks import hypernetwork
+from . import shared, errors, devices, sub_quadratic_attention
+from .hypernetworks import hypernetwork
 
 import ldm.modules.attention
 import ldm.modules.diffusionmodules.model

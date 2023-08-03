@@ -3,8 +3,8 @@ from collections import namedtuple
 
 import torch
 
-from modules import prompt_parser, devices, sd_hijack
-from modules.shared import opts
+from . import prompt_parser, devices, sd_hijack
+from .shared import opts
 
 
 class PromptChunk:
@@ -206,8 +206,8 @@ class FrozenCLIPEmbedderWithCustomWordsBase(torch.nn.Module):
         """
 
         if opts.use_old_emphasis_implementation:
-            import modules.sd_hijack_clip_old
-            return modules.sd_hijack_clip_old.forward_old(self, texts)
+            from . import sd_hijack_clip_old
+            return sd_hijack_clip_old.forward_old(self, texts)
 
         batch_chunks, token_count = self.process_texts(texts)
 
