@@ -14,9 +14,7 @@ mlflow.set_experiment("/Users/tang.j@ctw.inc/sd0728")
 # Define custom Python model class
 class StableDiffusion(mlflow.pyfunc.PythonModel):
   def load_context(self, context):
-    sys.path.append("/model/code")
-    sys.path.append("/model/code/sd_deploy")
-
+    pass
 
   def predict(self, context, input):
     output = webui_wrapper.simple_txt2img_test(input["input"][0])
