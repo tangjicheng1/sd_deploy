@@ -12,24 +12,17 @@ import gradio.utils
 import numpy as np
 from PIL import Image, PngImagePlugin  # noqa: F401
 
-from . import gfpgan_model, codeformer_model, call_queue, sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae, extra_networks, ui_common, ui_postprocessing, progress, ui_loadsave
+from . import generation_parameters_copypaste, extras, prompt_parser, styles, shared, scripts, gfpgan_model, codeformer_model, call_queue, sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae, extra_networks, ui_common, ui_postprocessing, progress, ui_loadsave
 from .ui_components import FormRow, FormGroup, ToolButton, FormHTML
 from .paths import script_path, data_path
 from .shared import opts, cmd_opts
 
-import modules.generation_parameters_copypaste as parameters_copypaste
-import modules.hypernetworks.ui
-from modules import scripts
-from modules import shared
-import modules.styles
-import modules.textual_inversion.ui
-from modules import prompt_parser
-from modules.sd_hijack import model_hijack
-from modules.sd_samplers import samplers, samplers_for_img2img
-from modules.textual_inversion import textual_inversion
-import modules.hypernetworks.ui
-from modules.generation_parameters_copypaste import image_from_url_text
-import modules.extras
+from .hypernetworks import ui as hypernetworks_ui
+from .textual_inversion import ui as textual_inversion_ui
+from .sd_hijack import model_hijack
+from .sd_samplers import samplers, samplers_for_img2img
+from .textual_inversion import textual_inversion
+from .generation_parameters_copypaste import image_from_url_text
 
 warnings.filterwarnings("default" if opts.show_warnings else "ignore", category=UserWarning)
 
@@ -43,7 +36,7 @@ if not cmd_opts.share and not cmd_opts.listen:
     gradio.utils.get_local_ip_address = lambda: '127.0.0.1'
 
 if cmd_opts.ngrok is not None:
-    import modules.ngrok as ngrok
+    from . import ngrok
     print('ngrok authtoken detected, trying to connect...')
     ngrok.connect(
         cmd_opts.ngrok,
@@ -88,7 +81,7 @@ def add_style(name: str, prompt: str, negative_prompt: str):
     if name is None:
         return [gr_show() for x in range(4)]
 
-    style = modules.styles.PromptStyle(name, prompt, negative_prompt)
+    style = styles.PromptStyle(name, prompt, negative_prompt)
     shared.prompt_styles.styles[style.name] = style
     # Save all loaded prompt styles: this allows us to update the storage format in the future more easily, because we
     # reserialize all styles every time we save them
@@ -98,7 +91,7 @@ def add_style(name: str, prompt: str, negative_prompt: str):
 
 
 def calc_resolution_hires(enable, width, height, hr_scale, hr_resize_x, hr_resize_y):
-    from modules import processing, devices
+    from . import processing, devices
 
     if not enable:
         return ""
@@ -430,12 +423,11 @@ def create_override_settings_dropdown(tabname, row):
 
 
 def create_ui():
-    from modules import txt2img
-    from modules import img2img
+    from . import txt2img, img2img
 
     reload_javascript()
 
-    parameters_copypaste.reset()
+    generation_parameters_copypaste.reset()
 
     scripts.scripts_current = scripts.scripts_txt2img
     scripts.scripts_txt2img.initialize_scripts(is_img2img=False)
@@ -447,7 +439,7 @@ def create_ui():
         txt_prompt_img = gr.File(label="", elem_id="txt2img_prompt_image", file_count="single", type="binary", visible=False)
 
         with FormRow(variant='compact', elem_id="txt2img_extra_networks", visible=False) as extra_networks:
-            from modules import ui_extra_networks
+            from . import ui_extra_networks
             extra_networks_ui = ui_extra_networks.create_ui(extra_networks, extra_networks_button, 'txt2img')
 
         with gr.Row().style(equal_height=False):
@@ -604,8 +596,9 @@ def create_ui():
                 show_progress=False,
             )
 
+            from . import images
             txt_prompt_img.change(
-                fn=modules.images.image_data,
+                fn=images.image_data,
                 inputs=[
                     txt_prompt_img
                 ],
@@ -652,8 +645,8 @@ def create_ui():
                 (hr_prompts_container, lambda d: gr.update(visible=True) if d.get("Hires prompt", "") != "" or d.get("Hires negative prompt", "") != "" else gr.update()),
                 *scripts.scripts_txt2img.infotext_fields
             ]
-            parameters_copypaste.add_paste_fields("txt2img", None, txt2img_paste_fields, override_settings)
-            parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
+            generation_parameters_copypaste.add_paste_fields("txt2img", None, txt2img_paste_fields, override_settings)
+            generation_parameters_copypaste.register_paste_params_button(generation_parameters_copypaste.ParamBinding(
                 paste_button=txt2img_paste, tabname="txt2img", source_text_component=txt2img_prompt, source_image_component=None,
             ))
 
@@ -682,7 +675,7 @@ def create_ui():
         img2img_prompt_img = gr.File(label="", elem_id="img2img_prompt_image", file_count="single", type="binary", visible=False)
 
         with FormRow(variant='compact', elem_id="img2img_extra_networks", visible=False) as extra_networks:
-            from modules import ui_extra_networks
+            from . import ui_extra_networks
             extra_networks_ui_img2img = ui_extra_networks.create_ui(extra_networks, extra_networks_button, 'img2img')
 
         with FormRow().style(equal_height=False):
@@ -890,8 +883,9 @@ def create_ui():
             connect_reuse_seed(seed, reuse_seed, generation_info, dummy_component, is_subseed=False)
             connect_reuse_seed(subseed, reuse_subseed, generation_info, dummy_component, is_subseed=True)
 
+            from .  import images
             img2img_prompt_img.change(
-                fn=modules.images.image_data,
+                fn=images.image_data,
                 inputs=[
                     img2img_prompt_img
                 ],
@@ -1051,9 +1045,9 @@ def create_ui():
                 (mask_blur, "Mask blur"),
                 *scripts.scripts_img2img.infotext_fields
             ]
-            parameters_copypaste.add_paste_fields("img2img", init_img, img2img_paste_fields, override_settings)
-            parameters_copypaste.add_paste_fields("inpaint", init_img_with_mask, img2img_paste_fields, override_settings)
-            parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
+            generation_parameters_copypaste.add_paste_fields("img2img", init_img, img2img_paste_fields, override_settings)
+            generation_parameters_copypaste.add_paste_fields("inpaint", init_img_with_mask, img2img_paste_fields, override_settings)
+            generation_parameters_copypaste.register_paste_params_button(generation_parameters_copypaste.ParamBinding(
                 paste_button=img2img_paste, tabname="img2img", source_text_component=img2img_prompt, source_image_component=None,
             ))
 
@@ -1072,15 +1066,15 @@ def create_ui():
                 generation_info = gr.Textbox(visible=False, elem_id="pnginfo_generation_info")
                 html2 = gr.HTML()
                 with gr.Row():
-                    buttons = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
+                    buttons = generation_parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
 
                 for tabname, button in buttons.items():
-                    parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
+                    generation_parameters_copypaste.register_paste_params_button(generation_parameters_copypaste.ParamBinding(
                         paste_button=button, tabname=tabname, source_text_component=generation_info, source_image_component=image,
                     ))
 
         image.change(
-            fn=call_queue.wrap_gradio_call(modules.extras.run_pnginfo),
+            fn=call_queue.wrap_gradio_call(extras.run_pnginfo),
             inputs=[image],
             outputs=[html, generation_info, html2],
         )
@@ -1100,14 +1094,14 @@ def create_ui():
                 interp_description = gr.HTML(value=update_interp_description("Weighted sum"), elem_id="modelmerger_interp_description")
 
                 with FormRow(elem_id="modelmerger_models"):
-                    primary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_primary_model_name", label="Primary model (A)")
-                    create_refresh_button(primary_model_name, modules.sd_models.list_models, lambda: {"choices": modules.sd_models.checkpoint_tiles()}, "refresh_checkpoint_A")
+                    primary_model_name = gr.Dropdown(sd_models.checkpoint_tiles(), elem_id="modelmerger_primary_model_name", label="Primary model (A)")
+                    create_refresh_button(primary_model_name, sd_models.list_models, lambda: {"choices": sd_models.checkpoint_tiles()}, "refresh_checkpoint_A")
 
-                    secondary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_secondary_model_name", label="Secondary model (B)")
-                    create_refresh_button(secondary_model_name, modules.sd_models.list_models, lambda: {"choices": modules.sd_models.checkpoint_tiles()}, "refresh_checkpoint_B")
+                    secondary_model_name = gr.Dropdown(sd_models.checkpoint_tiles(), elem_id="modelmerger_secondary_model_name", label="Secondary model (B)")
+                    create_refresh_button(secondary_model_name, sd_models.list_models, lambda: {"choices": sd_models.checkpoint_tiles()}, "refresh_checkpoint_B")
 
-                    tertiary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_tertiary_model_name", label="Tertiary model (C)")
-                    create_refresh_button(tertiary_model_name, modules.sd_models.list_models, lambda: {"choices": modules.sd_models.checkpoint_tiles()}, "refresh_checkpoint_C")
+                    tertiary_model_name = gr.Dropdown(sd_models.checkpoint_tiles(), elem_id="modelmerger_tertiary_model_name", label="Tertiary model (C)")
+                    create_refresh_button(tertiary_model_name, sd_models.list_models, lambda: {"choices": sd_models.checkpoint_tiles()}, "refresh_checkpoint_C")
 
                 custom_name = gr.Textbox(label="Custom Name (Optional)", elem_id="modelmerger_custom_name")
                 interp_amount = gr.Slider(minimum=0.0, maximum=1.0, step=0.05, label='Multiplier (M) - set to 0 to get model A', value=0.3, elem_id="modelmerger_interp_amount")
@@ -1162,7 +1156,7 @@ def create_ui():
                     new_hypernetwork_name = gr.Textbox(label="Name", elem_id="train_new_hypernetwork_name")
                     new_hypernetwork_sizes = gr.CheckboxGroup(label="Modules", value=["768", "320", "640", "1280"], choices=["768", "1024", "320", "640", "1280"], elem_id="train_new_hypernetwork_sizes")
                     new_hypernetwork_layer_structure = gr.Textbox("1, 2, 1", label="Enter hypernetwork layer structure", placeholder="1st and last digit must be 1. ex:'1, 2, 1'", elem_id="train_new_hypernetwork_layer_structure")
-                    new_hypernetwork_activation_func = gr.Dropdown(value="linear", label="Select activation function of hypernetwork. Recommended : Swish / Linear(none)", choices=modules.hypernetworks.ui.keys, elem_id="train_new_hypernetwork_activation_func")
+                    new_hypernetwork_activation_func = gr.Dropdown(value="linear", label="Select activation function of hypernetwork. Recommended : Swish / Linear(none)", choices=hypernetworks_ui.keys, elem_id="train_new_hypernetwork_activation_func")
                     new_hypernetwork_initialization_option = gr.Dropdown(value = "Normal", label="Select Layer weights initialization. Recommended: Kaiming for relu-like, Xavier for sigmoid-like, Normal otherwise", choices=["Normal", "KaimingUniform", "KaimingNormal", "XavierUniform", "XavierNormal"], elem_id="train_new_hypernetwork_initialization_option")
                     new_hypernetwork_add_layer_norm = gr.Checkbox(label="Add layer normalization", elem_id="train_new_hypernetwork_add_layer_norm")
                     new_hypernetwork_use_dropout = gr.Checkbox(label="Use dropout", elem_id="train_new_hypernetwork_use_dropout")
@@ -1307,7 +1301,7 @@ def create_ui():
                 ti_outcome = gr.HTML(elem_id="ti_error", value="")
 
         create_embedding.click(
-            fn=modules.textual_inversion.ui.create_embedding,
+            fn=textual_inversion_ui.create_embedding,
             inputs=[
                 new_embedding_name,
                 initialization_text,
@@ -1322,7 +1316,7 @@ def create_ui():
         )
 
         create_hypernetwork.click(
-            fn=modules.hypernetworks.ui.create_hypernetwork,
+            fn=hypernetworks_ui.create_hypernetwork,
             inputs=[
                 new_hypernetwork_name,
                 new_hypernetwork_sizes,
@@ -1342,7 +1336,7 @@ def create_ui():
         )
 
         run_preprocess.click(
-            fn=call_queue.wrap_gradio_gpu_call(modules.textual_inversion.ui.preprocess, extra_outputs=[gr.update()]),
+            fn=call_queue.wrap_gradio_gpu_call(textual_inversion_ui.preprocess, extra_outputs=[gr.update()]),
             _js="start_training_textual_inversion",
             inputs=[
                 dummy_component,
@@ -1378,7 +1372,7 @@ def create_ui():
         )
 
         train_embedding.click(
-            fn=call_queue.wrap_gradio_gpu_call(modules.textual_inversion.ui.train_embedding, extra_outputs=[gr.update()]),
+            fn=call_queue.wrap_gradio_gpu_call(textual_inversion_ui.train_embedding, extra_outputs=[gr.update()]),
             _js="start_training_textual_inversion",
             inputs=[
                 dummy_component,
@@ -1412,7 +1406,7 @@ def create_ui():
         )
 
         train_hypernetwork.click(
-            fn=call_queue.wrap_gradio_gpu_call(modules.hypernetworks.ui.train_hypernetwork, extra_outputs=[gr.update()]),
+            fn=call_queue.wrap_gradio_gpu_call(hypernetworks_ui.train_hypernetwork, extra_outputs=[gr.update()]),
             _js="start_training_textual_inversion",
             inputs=[
                 dummy_component,
@@ -1598,10 +1592,10 @@ def create_ui():
 
 
         def unload_sd_weights():
-            modules.sd_models.unload_model_weights()
+            sd_models.unload_model_weights()
 
         def reload_sd_weights():
-            modules.sd_models.reload_model_weights()
+            sd_models.reload_model_weights()
 
         unload_sd_model.click(
             fn=unload_sd_weights,
@@ -1671,7 +1665,7 @@ def create_ui():
                 component = create_setting_component(k, is_quicksettings=True)
                 component_dict[k] = component
 
-        parameters_copypaste.connect_paste_params_buttons()
+        generation_parameters_copypaste.connect_paste_params_buttons()
 
         with gr.Tabs(elem_id="tabs") as tabs:
             tab_order = {k: i for i, k in enumerate(opts.ui_tab_order)}
@@ -1745,12 +1739,12 @@ def create_ui():
 
         def modelmerger(*args):
             try:
-                results = modules.extras.run_modelmerger(*args)
+                results = extras.run_modelmerger(*args)
             except Exception as e:
                 print("Error loading/saving model file:", file=sys.stderr)
                 print(traceback.format_exc(), file=sys.stderr)
-                modules.sd_models.list_models()  # to remove the potentially missing models from the list
-                return [*[gr.Dropdown.update(choices=modules.sd_models.checkpoint_tiles()) for _ in range(4)], f"Error merging checkpoints: {e}"]
+                sd_models.list_models()  # to remove the potentially missing models from the list
+                return [*[gr.Dropdown.update(choices=sd_models.checkpoint_tiles()) for _ in range(4)], f"Error merging checkpoints: {e}"]
             return results
 
         modelmerger_merge.click(fn=lambda: '', inputs=[], outputs=[modelmerger_result])

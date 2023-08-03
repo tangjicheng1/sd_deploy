@@ -4,7 +4,7 @@ from abc import abstractmethod
 import PIL
 from PIL import Image
 
-from modules import modelloader, shared
+from . import modelloader, shared
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
 NEAREST = (Image.Resampling.NEAREST if hasattr(Image, 'Resampling') else Image.NEAREST)
