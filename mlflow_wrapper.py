@@ -86,7 +86,7 @@ with mlflow.start_run() as run:
         "model",
         python_model=StableDiffusion(),
         artifacts={},
-        pip_requirements=["transformers","torch", "torchvision", "accelerate", "xformers","piexif", "gradio", "pytorch_lightning"],
+        pip_requirements=["transformers","torch", "torchvision", "accelerate", "xformers","piexif", "gradio", "pytorch-lightning"],
         input_example=input_example,
         signature=signature,
         code_path=["/Workspace/Repos/tang.j@ctw.inc/sd_deploy/stabledeploy"],
