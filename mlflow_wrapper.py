@@ -91,7 +91,7 @@ with mlflow.start_run() as run:
         pip_requirements=["transformers","torch", "torchvision", "accelerate", "xformers","piexif", "gradio"],
         input_example=input_example,
         signature=signature,
-        code_path=["/Workspace/Repos/tang.j@ctw.inc/sd_deploy/", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/webui.py", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/webui_wrapper.py", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/module", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/ldm", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/k_diffusion", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/launch.py"],
+        code_path=["/Workspace/Repos/tang.j@ctw.inc/sd_deploy/", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/webui.py", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/webui_wrapper.py", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/modules", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/ldm", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/k_diffusion", "/Workspace/Repos/tang.j@ctw.inc/sd_deploy/launch.py"],
         await_registration_for=6000,
     )
 
