@@ -13,10 +13,9 @@ import html
 import shutil
 import errno
 
-from modules import extensions, shared, paths, config_states
-from modules.paths_internal import config_states_dir
-from modules import call_queue
-from modules import ui as ui_module
+from . import extensions, shared, paths, config_states ,call_queue
+from .paths_internal import config_states_dir
+from . import ui as ui_module
 
 available_extensions = {"extensions": []}
 STYLE_PRIMARY = ' style="color: var(--primary-400)"'

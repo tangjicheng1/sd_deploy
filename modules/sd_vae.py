@@ -1,6 +1,6 @@
 import os
 import collections
-from modules import paths, shared, devices, script_callbacks, sd_models
+from . import paths, shared, devices, script_callbacks, sd_models
 import glob
 from copy import deepcopy
 
@@ -178,7 +178,7 @@ unspecified = object()
 
 
 def reload_vae_weights(sd_model=None, vae_file=unspecified):
-    from modules import lowvram, devices, sd_hijack
+    from . import lowvram, devices, sd_hijack
 
     if not sd_model:
         sd_model = shared.sd_model

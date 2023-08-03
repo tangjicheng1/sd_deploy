@@ -9,8 +9,8 @@ import gradio as gr
 import torch
 import tqdm
 
-from modules import devices, styles, memmon, interrogate, localization, script_loading, errors, ui_components, shared_items, cmd_args
-from modules.paths_internal import models_path, script_path, data_path, sd_configs_path, sd_default_config, sd_model_file, default_sd_model_file, extensions_dir, extensions_builtin_dir  # noqa: F401
+from . import devices, styles, memmon, interrogate, localization, script_loading, errors, ui_components, shared_items, cmd_args
+from .paths_internal import models_path, script_path, data_path, sd_configs_path, sd_default_config, sd_model_file, default_sd_model_file, extensions_dir, extensions_builtin_dir  # noqa: F401
 from ldm.models.diffusion.ddpm import LatentDiffusion
 from typing import Optional
 
@@ -90,7 +90,7 @@ loaded_hypernetworks = []
 
 
 def reload_hypernetworks():
-    from modules.hypernetworks import hypernetwork
+    from .hypernetworks import hypernetwork
     global hypernetworks
 
     hypernetworks = hypernetwork.list_hypernetworks(cmd_opts.hypernetwork_dir)
@@ -217,7 +217,7 @@ class State:
         if self.current_latent is None:
             return
 
-        from modules import sd_samplers
+        from . import sd_samplers
         if opts.show_progress_grid:
             self.assign_current_image(sd_samplers.samples_to_image_grid(self.current_latent))
         else:
@@ -284,17 +284,17 @@ def options_section(section_identifier, options_dict):
 
 
 def list_checkpoint_tiles():
-    from modules import sd_models
+    from . import sd_models
     return sd_models.checkpoint_tiles()
 
 
 def refresh_checkpoints():
-    from modules import sd_models
+    from . import sd_models
     return sd_models.list_models()
 
 
 def list_samplers():
-    from modules import sd_samplers
+    from . import sd_samplers
     return sd_samplers.all_samplers
 
 
@@ -705,13 +705,13 @@ class Shared(sys.modules[__name__].__class__):
 
     @property
     def sd_model(self):
-        from modules import sd_models
+        from . import sd_models
 
         return sd_models.model_data.get_sd_model()
 
     @sd_model.setter
     def sd_model(self, value):
-        from modules import sd_models
+        from . import sd_models
 
         sd_models.model_data.set_sd_model(value)
 

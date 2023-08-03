@@ -7,8 +7,8 @@ import sys
 import gradio as gr
 import subprocess as sp
 
-from modules import call_queue, shared, generation_parameters_copypaste
-from modules import images as images_module
+from . import call_queue, shared, generation_parameters_copypaste
+from . import images as images_module
 
 folder_symbol = '\U0001f4c2'  # 📂
 
@@ -95,8 +95,8 @@ def save_files(js_data, images, do_make_zip, index):
 
 
 def create_output_panel(tabname, outdir):
-    from modules import shared
-    import modules.generation_parameters_copypaste as parameters_copypaste
+    from . import shared
+    import .generation_parameters_copypaste as parameters_copypaste
 
     def open_folder(f):
         if not os.path.exists(f):
@@ -199,10 +199,10 @@ Requested path was: {f}
 
             paste_field_names = []
             if tabname == "txt2img":
-                from modules import scripts
+                from . import scripts
                 paste_field_names = scripts.scripts_txt2img.paste_field_names
             elif tabname == "img2img":
-                from modules import scripts
+                from . import scripts
                 paste_field_names = scripts.scripts_img2img.paste_field_names
 
             for paste_tabname, paste_button in buttons.items():

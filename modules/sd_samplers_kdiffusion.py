@@ -2,7 +2,7 @@ from collections import deque
 import torch
 import inspect
 import k_diffusion.sampling
-from modules import prompt_parser, devices, sd_samplers_common, shared, script_callbacks
+from . import prompt_parser, devices, sd_samplers_common, shared, script_callbacks
 
 samplers_k_diffusion = [
     ('Euler a', 'sample_euler_ancestral', ['k_euler_a', 'k_euler_ancestral'], {"uses_ensd": True}),

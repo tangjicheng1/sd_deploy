@@ -8,7 +8,7 @@ import os
 import torch
 import torch.nn as nn
 
-from modules import devices, paths_internal
+from . import devices, paths_internal
 
 sd_vae_taesd = None
 
