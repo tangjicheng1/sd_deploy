@@ -129,7 +129,7 @@ def load_with_extra(filename, extra_handler=None, *args, **kwargs):
     definitely unsafe.
     """
 
-    from modules import shared
+    from . import shared
 
     try:
         if not shared.cmd_opts.disable_safe_unpickle:

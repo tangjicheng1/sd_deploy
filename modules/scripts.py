@@ -6,7 +6,7 @@ from collections import namedtuple
 
 import gradio as gr
 
-from modules import shared, paths, script_callbacks, extensions, script_loading, scripts_postprocessing
+from . import shared, paths, script_callbacks, extensions, script_loading, scripts_postprocessing
 
 AlwaysVisible = object()
 
@@ -299,7 +299,7 @@ class ScriptRunner:
         self.paste_field_names = []
 
     def initialize_scripts(self, is_img2img):
-        from modules import scripts_auto_postprocessing
+        from . import scripts_auto_postprocessing
 
         self.scripts.clear()
         self.alwayson_scripts.clear()
@@ -325,7 +325,7 @@ class ScriptRunner:
                 self.selectable_scripts.append(script)
 
     def setup_ui(self):
-        import modules.api.models as api_models
+        import api.models
 
         self.titles = [wrap_call(script.title, script.filename, "title") or f"{script.filename} [error]" for script in self.selectable_scripts]
 
@@ -347,7 +347,7 @@ class ScriptRunner:
             for control in controls:
                 control.custom_script_source = os.path.basename(script.filename)
 
-                arg_info = api_models.ScriptArg(label=control.label or "")
+                arg_info = api.models.ScriptArg(label=control.label or "")
 
                 for field in ("value", "minimum", "maximum", "step", "choices"):
                     v = getattr(control, field, None)
@@ -356,7 +356,7 @@ class ScriptRunner:
 
                 api_args.append(arg_info)
 
-            script.api_info = api_models.ScriptInfo(
+            script.api_info = api.models.ScriptInfo(
                 name=script.name,
                 is_img2img=script.is_img2img,
                 is_alwayson=script.alwayson,

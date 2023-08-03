@@ -1,7 +1,7 @@
 import os
 import gradio as gr
 
-from modules import errors, shared
+from . import errors, shared
 
 
 class PostprocessedImage:
@@ -89,7 +89,7 @@ class ScriptPostprocessingRunner:
 
     def scripts_in_preferred_order(self):
         if self.scripts is None:
-            from modules import scripts as scripts_module
+            from . import scripts as scripts_module
             self.initialize_scripts(scripts_module.postprocessing_scripts_data)
 
         scripts_order = shared.opts.postprocessing_operation_order

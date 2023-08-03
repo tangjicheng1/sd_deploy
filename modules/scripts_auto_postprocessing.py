@@ -1,4 +1,4 @@
-from modules import scripts, scripts_postprocessing, shared
+from . import scripts, scripts_postprocessing, shared
 
 
 class ScriptPostprocessingForMainUI(scripts.Script):
@@ -27,7 +27,7 @@ class ScriptPostprocessingForMainUI(scripts.Script):
 
 
 def create_auto_preprocessing_script_data():
-    from modules import scripts
+    from . import scripts
 
     res = []
 
