@@ -9,7 +9,7 @@ from contextlib import contextmanager
 
 from torch.optim.lr_scheduler import LambdaLR
 
-from stabledeploy.stabledeploy.ldm.modules.ema import LitEma
+from stabledeploy.ldm.modules.ema import LitEma
 from stabledeploy.taming.modules.vqvae.quantize import VectorQuantizer2 as VectorQuantizer
 from stabledeploy.stabledeploy.ldm.modules.diffusionmodules.model import Encoder, Decoder
 from stabledeploy.stabledeploy.ldm.util import instantiate_from_config
