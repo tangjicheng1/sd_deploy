@@ -5,16 +5,13 @@ import traceback
 import cv2
 import torch
 
-import modules.face_restoration
-import modules.shared
-from modules import shared, devices, modelloader
-from modules.paths import models_path
+from . import face_restoration, shared, devices, modelloader, paths
 
 # codeformer people made a choice to include modified basicsr library to their project which makes
 # it utterly impossible to use it alongside with other libraries that also use basicsr, like GFPGAN.
 # I am making a choice to include some files from codeformer to work around this issue.
 model_dir = "Codeformer"
-model_path = os.path.join(models_path, model_dir)
+model_path = os.path.join(paths.models_path, model_dir)
 model_url = 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth'
 
 have_codeformer = False
@@ -26,20 +23,20 @@ def setup_model(dirname):
     if not os.path.exists(model_path):
         os.makedirs(model_path)
 
-    path = modules.paths.paths.get("CodeFormer", None)
+    path = paths.paths.get("CodeFormer", None)
     if path is None:
         return
 
     try:
         from torchvision.transforms.functional import normalize
-        from modules.codeformer.codeformer_arch import CodeFormer
+        from .codeformer import codeformer_arch
         from basicsr.utils import img2tensor, tensor2img
         from facelib.utils.face_restoration_helper import FaceRestoreHelper
         from facelib.detection.retinaface import retinaface
 
-        net_class = CodeFormer
+        net_class = codeformer_arch.CodeFormer
 
-        class FaceRestorerCodeFormer(modules.face_restoration.FaceRestoration):
+        class FaceRestorerCodeFormer(face_restoration.FaceRestoration):
             def name(self):
                 return "CodeFormer"
 
