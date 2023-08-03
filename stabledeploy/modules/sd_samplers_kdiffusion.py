@@ -1,7 +1,7 @@
 from collections import deque
 import torch
 import inspect
-import k_diffusion.sampling
+import stabledeploy.k_diffusion.sampling
 from . import prompt_parser, devices, sd_samplers_common, shared, script_callbacks
 
 samplers_k_diffusion = [
@@ -29,7 +29,7 @@ samplers_k_diffusion = [
 samplers_data_k_diffusion = [
     sd_samplers_common.SamplerData(label, lambda model, funcname=funcname: KDiffusionSampler(funcname, model), aliases, options)
     for label, funcname, aliases, options in samplers_k_diffusion
-    if hasattr(k_diffusion.sampling, funcname)
+    if hasattr(stabledeploy.k_diffusion.sampling, funcname)
 ]
 
 sampler_extra_params = {
@@ -214,11 +214,11 @@ class TorchHijack:
 
 class KDiffusionSampler:
     def __init__(self, funcname, sd_model):
-        denoiser = k_diffusion.external.CompVisVDenoiser if sd_model.parameterization == "v" else k_diffusion.external.CompVisDenoiser
+        denoiser = stabledeploy.k_diffusion.external.CompVisVDenoiser if sd_model.parameterization == "v" else stabledeploy.k_diffusion.external.CompVisDenoiser
 
         self.model_wrap = denoiser(sd_model, quantize=shared.opts.enable_quantization)
         self.funcname = funcname
-        self.func = getattr(k_diffusion.sampling, self.funcname)
+        self.func = getattr(stabledeploy.k_diffusion.sampling, self.funcname)
         self.extra_params = sampler_extra_params.get(funcname, [])
         self.model_wrap_cfg = CFGDenoiser(self.model_wrap)
         self.sampler_noises = None
@@ -263,7 +263,7 @@ class KDiffusionSampler:
         self.eta = p.eta if p.eta is not None else shared.opts.eta_ancestral
         self.s_min_uncond = getattr(p, 's_min_uncond', 0.0)
 
-        k_diffusion.sampling.torch = TorchHijack(self.sampler_noises if self.sampler_noises is not None else [])
+        stabledeploy.k_diffusion.sampling.torch = TorchHijack(self.sampler_noises if self.sampler_noises is not None else [])
 
         extra_params_kwargs = {}
         for param_name in self.extra_params:
@@ -291,7 +291,7 @@ class KDiffusionSampler:
         elif self.config is not None and self.config.options.get('scheduler', None) == 'karras':
             sigma_min, sigma_max = (0.1, 10) if shared.opts.use_old_karras_scheduler_sigmas else (self.model_wrap.sigmas[0].item(), self.model_wrap.sigmas[-1].item())
 
-            sigmas = k_diffusion.sampling.get_sigmas_karras(n=steps, sigma_min=sigma_min, sigma_max=sigma_max, device=shared.device)
+            sigmas = stabledeploy.k_diffusion.sampling.get_sigmas_karras(n=steps, sigma_min=sigma_min, sigma_max=sigma_max, device=shared.device)
         else:
             sigmas = self.model_wrap.get_sigmas(steps)
 
@@ -305,7 +305,7 @@ class KDiffusionSampler:
         if shared.opts.no_dpmpp_sde_batch_determinism:
             return None
 
-        from k_diffusion.sampling import BrownianTreeNoiseSampler
+        from stabledeploy.k_diffusion.sampling import BrownianTreeNoiseSampler
         sigma_min, sigma_max = sigmas[sigmas > 0].min(), sigmas.max()
         current_iter_seeds = p.all_seeds[p.iteration * p.batch_size:(p.iteration + 1) * p.batch_size]
         return BrownianTreeNoiseSampler(x, sigma_min, sigma_max, seed=current_iter_seeds)
