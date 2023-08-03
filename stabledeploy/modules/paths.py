@@ -10,7 +10,6 @@ sys.path.insert(0, script_path)
 BLIP_path = os.path.join(script_path, 'repositories/BLIP')
 
 path_dirs = [
-    (os.path.join(BLIP_path, '../taming-transformers'), 'taming', 'Taming Transformers', []),
     (os.path.join(BLIP_path, '../CodeFormer'), 'inference_codeformer.py', 'CodeFormer', []),
     (os.path.join(BLIP_path, '../BLIP'), 'models/blip.py', 'BLIP', []),
     # (os.path.join(BLIP_path, '../k-diffusion'), 'k_diffusion/sampling.py', 'k_diffusion', ["atstart"]),
