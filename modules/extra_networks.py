@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 
-from modules import errors
+from . import errors
 
 extra_network_registry = {}
 
@@ -15,7 +15,7 @@ def register_extra_network(extra_network):
 
 
 def register_default_extra_networks():
-    from modules.extra_networks_hypernet import ExtraNetworkHypernet
+    from .extra_networks_hypernet import ExtraNetworkHypernet
     register_extra_network(ExtraNetworkHypernet())
 
 

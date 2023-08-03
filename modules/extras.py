@@ -7,8 +7,8 @@ import json
 import torch
 import tqdm
 
-from modules import shared, images, sd_models, sd_vae, sd_models_config
-from modules.ui_common import plaintext_to_html
+from . import shared, images, sd_models, sd_vae, sd_models_config
+from .ui_common import plaintext_to_html
 import gradio as gr
 import safetensors.torch
 

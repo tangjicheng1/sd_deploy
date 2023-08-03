@@ -1,5 +1,4 @@
-from modules import shared
-
+from . import shared
 
 class FaceRestoration:
     def name(self):

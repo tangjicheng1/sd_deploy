@@ -5,8 +5,8 @@ import os
 import re
 
 import gradio as gr
-from modules.paths import data_path
-from modules import shared, ui_tempdir, script_callbacks
+from .paths import data_path
+from . import shared, ui_tempdir, script_callbacks
 from PIL import Image
 
 re_param_code = r'\s*([\w ]+):\s*("(?:\\"[^,]|\\"|\\|[^\"])+"|[^,]*)(?:,|$)'
@@ -84,7 +84,7 @@ def add_paste_fields(tabname, init_img, fields, override_settings_component=None
     paste_fields[tabname] = {"init_img": init_img, "fields": fields, "override_settings_component": override_settings_component}
 
     # backwards compatibility for existing extensions
-    from modules import ui
+    from . import ui
     if tabname == 'txt2img':
         ui.txt2img_paste_fields = fields
     elif tabname == 'img2img':
@@ -223,7 +223,7 @@ def restore_old_hires_fix_params(res):
     height = int(res.get("Size-2", 512))
 
     if firstpass_width == 0 or firstpass_height == 0:
-        from modules import processing
+        from . import processing
         firstpass_width, firstpass_height = processing.old_hires_fix_first_pass_dimensions(width, height)
 
     res['Size-1'] = firstpass_width

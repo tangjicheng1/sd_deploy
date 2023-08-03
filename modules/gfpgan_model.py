@@ -5,8 +5,7 @@ import traceback
 import facexlib
 import gfpgan
 
-import modules.face_restoration
-from modules import paths, shared, devices, modelloader
+from . import paths, shared, devices, modelloader, face_restoration
 
 model_dir = "GFPGAN"
 user_path = None
@@ -103,7 +102,7 @@ def setup_model(dirname):
         have_gfpgan = True
         gfpgan_constructor = GFPGANer
 
-        class FaceRestorerGFPGAN(modules.face_restoration.FaceRestoration):
+        class FaceRestorerGFPGAN(face_restoration.FaceRestoration):
             def name(self):
                 return "GFPGAN"
 

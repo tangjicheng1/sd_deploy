@@ -17,9 +17,9 @@ import string
 import json
 import hashlib
 
-from modules import sd_samplers, shared, script_callbacks, errors
-from modules.paths_internal import roboto_ttf_file
-from modules.shared import opts
+from . import sd_samplers, shared, script_callbacks, errors
+from .paths_internal import roboto_ttf_file
+from .shared import opts
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
 
