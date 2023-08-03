@@ -113,4 +113,4 @@ loaded_model = mlflow.pyfunc.load_model('runs:/'+run.info.run_id+'/model')
 # Make a prediction using the loaded model
 result_image = loaded_model.predict(input_example)
 pic = Image.open(BytesIO(base64.b64decode(result_image)))
-pic.save("mlflow_1.jpg")
+pic.save("12.jpg")
