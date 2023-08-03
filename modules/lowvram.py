@@ -1,5 +1,5 @@
 import torch
-from modules import devices
+from . import devices
 
 module_in_gpu = None
 cpu = torch.device("cpu")

@@ -17,7 +17,7 @@ def list_localizations(dirname):
 
         localizations[fn] = os.path.join(dirname, file)
 
-    from modules import scripts
+    from . import scripts
     for file in scripts.list_scripts("localizations", ".json"):
         fn, ext = os.path.splitext(file.filename)
         localizations[fn] = file.path

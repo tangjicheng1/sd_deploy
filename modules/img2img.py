@@ -3,14 +3,11 @@ import os
 import numpy as np
 from PIL import Image, ImageOps, ImageFilter, ImageEnhance, ImageChops, UnidentifiedImageError
 
-from modules import sd_samplers
-from modules.generation_parameters_copypaste import create_override_settings_dict
-from modules.processing import Processed, StableDiffusionProcessingImg2Img, process_images
-from modules.shared import opts, state
-import modules.shared as shared
-import modules.processing as processing
-from modules.ui import plaintext_to_html
-import modules.scripts
+from . import sd_samplers, shared, processing, scripts
+from .generation_parameters_copypaste import create_override_settings_dict
+from .processing import Processed, StableDiffusionProcessingImg2Img, process_images
+from .shared import opts, state
+from .ui import plaintext_to_html
 
 
 def process_batch(p, input_dir, output_dir, inpaint_mask_dir, args):
@@ -60,7 +57,7 @@ def process_batch(p, input_dir, output_dir, inpaint_mask_dir, args):
             mask_image = Image.open(mask_image_path)
             p.image_mask = mask_image
 
-        proc = modules.scripts.scripts_img2img.run(p, *args)
+        proc = scripts.scripts_img2img.run(p, *args)
         if proc is None:
             proc = process_images(p)
 
@@ -157,7 +154,7 @@ def img2img(id_task: str, mode: int, prompt: str, negative_prompt: str, prompt_s
         override_settings=override_settings,
     )
 
-    p.scripts = modules.scripts.scripts_img2img
+    p.scripts = scripts.scripts_img2img
     p.script_args = args
 
     if shared.cmd_opts.enable_console_prompts:
@@ -173,7 +170,7 @@ def img2img(id_task: str, mode: int, prompt: str, negative_prompt: str, prompt_s
 
         processed = Processed(p, [], p.seed, "")
     else:
-        processed = modules.scripts.scripts_img2img.run(p, *args)
+        processed = scripts.scripts_img2img.run(p, *args)
         if processed is None:
             processed = process_images(p)
 

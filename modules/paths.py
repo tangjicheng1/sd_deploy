@@ -1,8 +1,8 @@
 import os
 import sys
-from modules.paths_internal import models_path, script_path, data_path, extensions_dir, extensions_builtin_dir  # noqa: F401
+from .paths_internal import models_path, script_path, data_path, extensions_dir, extensions_builtin_dir  # noqa: F401
 
-import modules.safe  # noqa: F401
+from . import safe  # noqa: F401
 
 
 sys.path.insert(0, script_path)

@@ -3,9 +3,9 @@ import shutil
 import importlib
 from urllib.parse import urlparse
 
-from modules import shared
-from modules.upscaler import Upscaler, UpscalerLanczos, UpscalerNearest, UpscalerNone
-from modules.paths import script_path, models_path
+from . import shared
+from .upscaler import Upscaler, UpscalerLanczos, UpscalerNearest, UpscalerNone
+from .paths import script_path, models_path
 
 
 def load_models(model_path: str, model_url: str = None, command_path: str = None, ext_filter=None, download_name=None, ext_blacklist=None) -> list:

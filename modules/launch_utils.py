@@ -7,8 +7,8 @@ import platform
 import json
 from functools import lru_cache
 
-from modules import cmd_args
-from modules.paths_internal import script_path, extensions_dir
+from . import cmd_args
+from .paths_internal import script_path, extensions_dir
 
 args, _ = cmd_args.parser.parse_known_args()
 
@@ -36,9 +36,8 @@ def check_python_version():
         supported_minors = [7, 8, 9, 10, 11]
 
     if not (major == 3 and minor in supported_minors):
-        import modules.errors
-
-        modules.errors.print_error_explanation(f"""
+        from . import errors
+        errors.print_error_explanation(f"""
 INCOMPATIBLE PYTHON VERSION
 
 This program is tested with 3.10.6 Python, but you have {major}.{minor}.{micro}.

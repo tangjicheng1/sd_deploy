@@ -12,17 +12,9 @@ import cv2
 from skimage import exposure
 from typing import Any, Dict, List
 
-from modules import sd_hijack
-import modules.sd_hijack
-from modules import devices, prompt_parser, masking, sd_samplers, lowvram, generation_parameters_copypaste, extra_networks, sd_vae_approx, scripts, sd_samplers_common
-from modules.shared import opts, cmd_opts, state
-import modules.shared as shared
-import modules.paths as paths
-import modules.face_restoration
-import modules.images as images
-import modules.styles
-import modules.sd_models as sd_models
-import modules.sd_vae as sd_vae
+from . import sd_vae, sd_models, styles, images, face_restoration, paths, shared, sd_hijack, devices, prompt_parser, masking, sd_samplers, lowvram, generation_parameters_copypaste, extra_networks, sd_vae_approx, scripts, sd_samplers_common
+from .shared import opts, cmd_opts, state
+
 import logging
 from ldm.data.util import AddMiDaS
 from ldm.models.diffusion.ddpm import LatentDepth2ImageDiffusion
@@ -636,8 +628,8 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
     seed = get_fixed_seed(p.seed)
     subseed = get_fixed_seed(p.subseed)
 
-    modules.sd_hijack.model_hijack.apply_circular(p.tiling)
-    modules.sd_hijack.model_hijack.clear_comments()
+    sd_hijack.model_hijack.apply_circular(p.tiling)
+    sd_hijack.model_hijack.clear_comments()
 
     comments = {}
 
@@ -756,7 +748,7 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
 
                     devices.torch_gc()
 
-                    x_sample = modules.face_restoration.restore_faces(x_sample)
+                    x_sample = face_restoration.restore_faces(x_sample)
                     devices.torch_gc()
 
                 image = Image.fromarray(x_sample)
