@@ -532,9 +532,10 @@ def load_scripts():
             sys.path = syspath
             current_basedir = paths.script_path
 
-    stabledeploy.modules.scripts.scripts_txt2img = ScriptRunner()
-    stabledeploy.modules.scripts.scripts_img2img = ScriptRunner()
-    stabledeploy.modules.scripts.scripts_postproc = scripts_postprocessing.ScriptPostprocessingRunner()
+    from stabledeploy.modules.scripts import scripts_txt2img, scripts_img2img, scripts_postproc
+    scripts_txt2img = ScriptRunner()
+    scripts_img2img = ScriptRunner()
+    scripts_postproc = scripts_postprocessing.ScriptPostprocessingRunner()
 
 def reload_script_body_only():
     cache = {}
