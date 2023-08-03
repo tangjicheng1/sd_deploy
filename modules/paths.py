@@ -5,7 +5,6 @@ from modules.paths_internal import models_path, script_path, data_path, extensio
 import modules.safe  # noqa: F401
 
 
-# data_path = cmd_opts_pre.data
 sys.path.insert(0, script_path)
 
 BLIP_path = os.path.join(script_path, 'repositories/BLIP')

@@ -4,7 +4,7 @@ import threading
 import traceback
 import time
 
-from modules import shared, progress
+from . import shared, progress
 
 queue_lock = threading.Lock()
 
