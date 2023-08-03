@@ -12,17 +12,17 @@ import gradio.utils
 import numpy as np
 from PIL import Image, PngImagePlugin  # noqa: F401
 
-from . import generation_parameters_copypaste, extras, prompt_parser, styles, shared, scripts, gfpgan_model, codeformer_model, call_queue, sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae, extra_networks, ui_common, ui_postprocessing, progress, ui_loadsave
-from .ui_components import FormRow, FormGroup, ToolButton, FormHTML
-from .paths import script_path, data_path
-from .shared import opts, cmd_opts
+from stabledeploy.modules import generation_parameters_copypaste, extras, prompt_parser, styles, shared, scripts, gfpgan_model, codeformer_model, call_queue, sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae, extra_networks, ui_common, ui_postprocessing, progress, ui_loadsave
+from stabledeploy.modules.ui_components import FormRow, FormGroup, ToolButton, FormHTML
+from stabledeploy.modules.paths import script_path, data_path
+from stabledeploy.modules.shared import opts, cmd_opts
 
-from .hypernetworks import ui as hypernetworks_ui
-from .textual_inversion import ui as textual_inversion_ui
-from .sd_hijack import model_hijack
-from .sd_samplers import samplers, samplers_for_img2img
-from .textual_inversion import textual_inversion
-from .generation_parameters_copypaste import image_from_url_text
+from stabledeploy.modules.hypernetworks import ui as hypernetworks_ui
+from stabledeploy.modules.textual_inversion import ui as textual_inversion_ui
+from stabledeploy.modules.sd_hijack import model_hijack
+from stabledeploy.modules.sd_samplers import samplers, samplers_for_img2img
+from stabledeploy.modules.textual_inversion import textual_inversion
+from stabledeploy.modules.generation_parameters_copypaste import image_from_url_text
 
 warnings.filterwarnings("default" if opts.show_warnings else "ignore", category=UserWarning)
 
