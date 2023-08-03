@@ -525,7 +525,7 @@ def fix_seed(p):
 
 
 def program_version():
-    import launch
+    from stabledeploy import launch
 
     res = launch.git_tag()
     if res == "<none>":

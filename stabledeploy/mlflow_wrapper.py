@@ -7,7 +7,7 @@ from PIL import Image
 from mlflow.models.signature import ModelSignature
 from mlflow.types import DataType, Schema, ColSpec, TensorSpec
 
-import webui_wrapper
+from stabledeploy import webui_wrapper
 
 mlflow.set_experiment("/Users/tang.j@ctw.inc/sd0728")
 
