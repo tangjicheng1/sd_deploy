@@ -11,10 +11,10 @@ from torch.optim.lr_scheduler import LambdaLR
 
 from stabledeploy.ldm.modules.ema import LitEma
 from stabledeploy.taming.modules.vqvae.quantize import VectorQuantizer2 as VectorQuantizer
-from stabledeploy.stabledeploy.ldm.modules.diffusionmodules.model import Encoder, Decoder
-from stabledeploy.stabledeploy.ldm.util import instantiate_from_config
+from stabledeploy.ldm.modules.diffusionmodules.model import Encoder, Decoder
+from stabledeploy.ldm.util import instantiate_from_config
 
-import stabledeploy.stabledeploy.ldm.models.autoencoder
+import stabledeploy.ldm.models.autoencoder
 from packaging import version
 
 class VQModel(pl.LightningModule):
