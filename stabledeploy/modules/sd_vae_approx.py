@@ -39,6 +39,8 @@ def model():
         sd_vae_approx_model = VAEApprox()
         if not os.path.exists(model_path):
             model_path = os.path.join(paths.script_path, "models", "VAE-approx", "model.pt")
+        print(f"[tangjicheng] sd_vae_approx_model model_path: {paths.script_path}")
+        print(f"[tangjicheng] sd_vae_approx_model model_path: {model_path}")
         sd_vae_approx_model.load_state_dict(torch.load(model_path, map_location='cpu' if devices.device.type != 'cuda' else None))
         sd_vae_approx_model.eval()
         sd_vae_approx_model.to(devices.device, devices.dtype)
