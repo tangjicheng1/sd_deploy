@@ -5,8 +5,6 @@ from .paths_internal import models_path, script_path, data_path, extensions_dir,
 from . import safe  # noqa: F401
 
 
-sys.path.insert(0, script_path)
-
 BLIP_path = os.path.join(script_path, 'repositories/BLIP')
 
 path_dirs = [
@@ -25,22 +23,4 @@ for d, must_exist, what, options in path_dirs:
         print(f"Warning: {what} not found at path {must_exist_path}", file=sys.stderr)
     else:
         d = os.path.abspath(d)
-        if "atstart" in options:
-            sys.path.insert(0, d)
-        else:
-            sys.path.append(d)
         paths[what] = d
-
-
-class Prioritize:
-    def __init__(self, name):
-        self.name = name
-        self.path = None
-
-    def __enter__(self):
-        self.path = sys.path.copy()
-        sys.path = [paths[self.name]] + sys.path
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        sys.path = self.path
-        self.path = None

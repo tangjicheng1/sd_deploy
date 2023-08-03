@@ -135,4 +135,3 @@ def setup_model(dirname):
         print("Error setting up CodeFormer:", file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
 
-   # sys.path = stored_sys_path
