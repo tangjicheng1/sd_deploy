@@ -80,6 +80,12 @@ input_value = '''{
 
 input_example = {"input": input_value}
 
+requirements_path = "./requirements.txt"  # 替换为你的文件路径
+requirements = []
+with open(requirements_path, 'r') as file:
+    for line in file:
+        # 使用strip()方法去除每行末尾的换行符（\n）
+        requirements.append(line.strip())
 
 # Log the model with its details such as artifacts, pip requirements and input example
 with mlflow.start_run() as run:  
@@ -87,7 +93,7 @@ with mlflow.start_run() as run:
         "model",
         python_model=StableDiffusion(),
         artifacts={},
-        pip_requirements=["transformers", "torch", "torchvision", "accelerate", "xformers","piexif", "gradio", "pytorch-lightning"],
+        pip_requirements=requirements,
         input_example=input_example,
         signature=signature,
         code_path=["/Workspace/Repos/tang.j@ctw.inc/sd_deploy/stabledeploy"],
