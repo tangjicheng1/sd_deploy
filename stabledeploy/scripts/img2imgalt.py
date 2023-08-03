@@ -6,7 +6,7 @@ from tqdm import trange
 import modules.scripts as scripts
 import gradio as gr
 
-from modules import processing, shared, sd_samplers, sd_samplers_common
+from stabledeploy.modules import processing, shared, sd_samplers, sd_samplers_common
 
 import torch
 import k_diffusion as K

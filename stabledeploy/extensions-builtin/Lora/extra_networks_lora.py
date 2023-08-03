@@ -1,4 +1,4 @@
-from modules import extra_networks, shared
+from stabledeploy.modules import extra_networks, shared
 import lora
 
 

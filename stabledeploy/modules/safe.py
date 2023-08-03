@@ -159,7 +159,7 @@ class Extra:
 
 ```
 import torch
-from modules import safe
+from stabledeploy.modules import safe
 
 def handler(module, name):
     if module == 'torch' and name in ['float64', 'float16']:

@@ -1,12 +1,12 @@
 import math
 
-from modules import scripts
+from stabledeploy.modules import scripts
 import gradio as gr
 from PIL import Image
 
-from modules import processing, shared, images, devices
-from modules.processing import Processed
-from modules.shared import opts, state
+from stabledeploy.modules import processing, shared, images, devices
+from stabledeploy.modules.processing import Processed
+from stabledeploy.modules.shared import opts, state
 
 
 class Script(scripts.Script):

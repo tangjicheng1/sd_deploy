@@ -10,7 +10,7 @@ from random import shuffle, choices
 
 import random
 import tqdm
-from modules import devices, shared
+from stabledeploy.modules import devices, shared
 import re
 
 from stabledeploy.ldm.modules.distributions.distributions import DiagonalGaussianDistribution

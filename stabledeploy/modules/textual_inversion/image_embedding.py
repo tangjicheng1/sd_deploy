@@ -134,7 +134,7 @@ def caption_image_overlay(srcimage, title, footerLeft, footerMid, footerRight, t
     image = srcimage.copy()
     fontsize = 32
     if textfont is None:
-        from modules.images import get_font
+        from stabledeploy.modules.images import get_font
         textfont = get_font(fontsize)
 
     factor = 1.5

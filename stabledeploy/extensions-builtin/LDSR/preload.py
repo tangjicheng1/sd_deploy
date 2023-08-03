@@ -1,5 +1,5 @@
 import os
-from modules import paths
+from stabledeploy.modules import paths
 
 
 def preload(parser):

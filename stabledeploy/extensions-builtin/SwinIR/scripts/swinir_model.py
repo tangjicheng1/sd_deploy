@@ -6,11 +6,11 @@ from PIL import Image
 from basicsr.utils.download_util import load_file_from_url
 from tqdm import tqdm
 
-from modules import modelloader, devices, script_callbacks, shared
-from modules.shared import opts, state
+from stabledeploy.modules import modelloader, devices, script_callbacks, shared
+from stabledeploy.modules.shared import opts, state
 from swinir_model_arch import SwinIR as net
 from swinir_model_arch_v2 import Swin2SR as net2
-from modules.upscaler import Upscaler, UpscalerData
+from stabledeploy.modules.upscaler import Upscaler, UpscalerData
 
 
 device_swinir = devices.get_device_for('swinir')

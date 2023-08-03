@@ -9,10 +9,10 @@ from tqdm import tqdm
 
 from basicsr.utils.download_util import load_file_from_url
 
-from modules import upscaler
-from modules import devices, modelloader, script_callbacks
+from stabledeploy.modules import upscaler
+from stabledeploy.modules import devices, modelloader, script_callbacks
 from scunet_model_arch import SCUNet as net
-from modules.shared import opts
+from stabledeploy.modules.shared import opts
 
 
 class UpscalerScuNET(upscaler.Upscaler):
@@ -140,7 +140,7 @@ class UpscalerScuNET(upscaler.Upscaler):
 
 def on_ui_settings():
     import gradio as gr
-    from modules import shared
+    from stabledeploy.modules import shared
 
     shared.opts.add_option("SCUNET_tile", shared.OptionInfo(256, "Tile size for SCUNET upscalers.", gr.Slider, {"minimum": 0, "maximum": 512, "step": 16}, section=('upscaling', "Upscaling")).info("0 = no tiling"))
     shared.opts.add_option("SCUNET_tile_overlap", shared.OptionInfo(8, "Tile overlap for SCUNET upscalers.", gr.Slider, {"minimum": 0, "maximum": 64, "step": 1}, section=('upscaling', "Upscaling")).info("Low values = visible seam"))

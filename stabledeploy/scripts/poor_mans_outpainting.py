@@ -4,9 +4,9 @@ import modules.scripts as scripts
 import gradio as gr
 from PIL import Image, ImageDraw
 
-from modules import images, devices
-from modules.processing import Processed, process_images
-from modules.shared import opts, state
+from stabledeploy.modules import images, devices
+from stabledeploy.modules.processing import Processed, process_images
+from stabledeploy.modules.shared import opts, state
 
 
 class Script(scripts.Script):

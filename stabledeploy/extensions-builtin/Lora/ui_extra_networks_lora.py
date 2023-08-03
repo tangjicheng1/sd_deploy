@@ -2,7 +2,7 @@ import json
 import os
 import lora
 
-from modules import shared, ui_extra_networks
+from stabledeploy.modules import shared, ui_extra_networks
 
 
 class ExtraNetworksPageLora(ui_extra_networks.ExtraNetworksPage):

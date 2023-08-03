@@ -3,8 +3,8 @@ import gradio as gr
 import ast
 import copy
 
-from modules.processing import Processed
-from modules.shared import cmd_opts
+from stabledeploy.modules.processing import Processed
+from stabledeploy.modules.shared import cmd_opts
 
 
 def convertExpr2Expression(expr):
@@ -44,7 +44,7 @@ class Script(scripts.Script):
         return cmd_opts.allow_code
 
     def ui(self, is_img2img):
-        example = """from modules.processing import process_images
+        example = """from stabledeploy.modules.processing import process_images
 
 p.width = 768
 p.height = 768

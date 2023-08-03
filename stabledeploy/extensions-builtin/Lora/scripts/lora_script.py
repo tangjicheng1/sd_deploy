@@ -7,7 +7,7 @@ from fastapi import FastAPI
 import lora
 import extra_networks_lora
 import ui_extra_networks_lora
-from modules import script_callbacks, ui_extra_networks, extra_networks, shared
+from stabledeploy.modules import script_callbacks, ui_extra_networks, extra_networks, shared
 
 def unload():
     torch.nn.Linear.forward = torch.nn.Linear_forward_before_lora

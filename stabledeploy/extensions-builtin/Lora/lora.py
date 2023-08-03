@@ -3,7 +3,7 @@ import re
 import torch
 from typing import Union
 
-from modules import shared, devices, sd_models, errors, scripts, sd_hijack, hashes
+from stabledeploy.modules import shared, devices, sd_models, errors, scripts, sd_hijack, hashes
 
 metadata_tags_order = {"ss_sd_model_name": 1, "ss_resolution": 2, "ss_clip_skip": 3, "ss_num_train_images": 10, "ss_tag_frequency": 20}
 

@@ -2,7 +2,7 @@ import html
 
 import gradio as gr
 import modules.hypernetworks.hypernetwork
-from modules import devices, sd_hijack, shared
+from stabledeploy.modules import devices, sd_hijack, shared
 
 not_available = ["hardswish", "multiheadattention"]
 keys = [x for x in modules.hypernetworks.hypernetwork.HypernetworkModule.activation_dict if x not in not_available]

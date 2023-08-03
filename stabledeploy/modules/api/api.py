@@ -13,22 +13,22 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from secrets import compare_digest
 
-from modules import shared, processing
-from modules import sd_samplers, deepbooru, sd_hijack, images, scripts, ui, postprocessing
-from modules.api import models
-from modules.textual_inversion.textual_inversion import create_embedding, train_embedding
-from modules.textual_inversion.preprocess import preprocess
-from modules.hypernetworks.hypernetwork import create_hypernetwork, train_hypernetwork
+from stabledeploy.modules import shared, processing
+from stabledeploy.modules import sd_samplers, deepbooru, sd_hijack, images, scripts, ui, postprocessing
+from stabledeploy.modules.api import models
+from stabledeploy.modules.textual_inversion.textual_inversion import create_embedding, train_embedding
+from stabledeploy.modules.textual_inversion.preprocess import preprocess
+from stabledeploy.modules.hypernetworks.hypernetwork import create_hypernetwork, train_hypernetwork
 from PIL import PngImagePlugin,Image
-from modules.sd_models import checkpoints_list, unload_model_weights, reload_model_weights
-from modules.sd_models_config import find_checkpoint_config_near_filename
-from modules.realesrgan_model import get_realesrgan_models
-from modules import devices
+from stabledeploy.modules.sd_models import checkpoints_list, unload_model_weights, reload_model_weights
+from stabledeploy.modules.sd_models_config import find_checkpoint_config_near_filename
+from stabledeploy.modules.realesrgan_model import get_realesrgan_models
+from stabledeploy.modules import devices
 from typing import Dict, List, Any
 import piexif
 import piexif.helper
 
-from modules.api import api_log
+from stabledeploy.modules.api import api_log
 
 def upscaler_to_index(name: str):
     try:

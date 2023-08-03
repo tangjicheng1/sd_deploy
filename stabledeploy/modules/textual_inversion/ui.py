@@ -2,9 +2,9 @@ import html
 
 import gradio as gr
 
-from modules.textual_inversion import textual_inversion
-from modules.textual_inversion import preprocess as preprocess_module
-from modules import sd_hijack, shared
+from stabledeploy.modules.textual_inversion import textual_inversion
+from stabledeploy.modules.textual_inversion import preprocess as preprocess_module
+from stabledeploy.modules import sd_hijack, shared
 
 
 def create_embedding(name, initialization_text, nvpt, overwrite_old):

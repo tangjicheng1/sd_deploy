@@ -38,34 +38,34 @@ startup_timer.record("import gradio")
 import stabledeploy.ldm.modules.encoders.modules  # noqa: F401
 startup_timer.record("import ldm")
 
-from modules import extra_networks
-from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, queue_lock  # noqa: F401
+from stabledeploy.modules import extra_networks
+from stabledeploy.modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, queue_lock  # noqa: F401
 
 # Truncate version number of nightly/local build of PyTorch to not cause exceptions with CodeFormer or Safetensors
 if ".dev" in torch.__version__ or "+git" in torch.__version__:
     torch.__long_version__ = torch.__version__
     torch.__version__ = re.search(r'[\d.]+[\d]', torch.__version__).group(0)
 
-from modules import shared, sd_samplers, upscaler, extensions, localization, ui_tempdir, ui_extra_networks, config_states
-from modules import codeformer_model as codeformer
-from modules import face_restoration
-from modules import gfpgan_model as gfpgan
-from modules import img2img
+from stabledeploy.modules import shared, sd_samplers, upscaler, extensions, localization, ui_tempdir, ui_extra_networks, config_states
+from stabledeploy.modules import codeformer_model as codeformer
+from stabledeploy.modules import face_restoration
+from stabledeploy.modules import gfpgan_model as gfpgan
+from stabledeploy.modules import img2img
 
-from modules import lowvram
-from modules import scripts
-from modules import sd_hijack
-from modules import sd_hijack_optimizations
-from modules import sd_vae
-from modules import txt2img
-from modules import script_callbacks
-from modules.textual_inversion import textual_inversion
-from modules import progress
+from stabledeploy.modules import lowvram
+from stabledeploy.modules import scripts
+from stabledeploy.modules import sd_hijack
+from stabledeploy.modules import sd_hijack_optimizations
+from stabledeploy.modules import sd_vae
+from stabledeploy.modules import txt2img
+from stabledeploy.modules import script_callbacks
+from stabledeploy.modules.textual_inversion import textual_inversion
+from stabledeploy.modules import progress
 
-from modules import ui
-from modules import modelloader
-from modules import shared
-from modules.hypernetworks import hypernetwork
+from stabledeploy.modules import ui
+from stabledeploy.modules import modelloader
+from stabledeploy.modules import shared
+from stabledeploy.modules.hypernetworks import hypernetwork
 
 startup_timer.record("other imports")
 
@@ -277,7 +277,7 @@ def configure_cors_middleware(app):
 
 
 def create_api(app):
-    from modules.api.api import Api
+    from stabledeploy.modules.api.api import Api
     api = Api(app, queue_lock)
     return api
 

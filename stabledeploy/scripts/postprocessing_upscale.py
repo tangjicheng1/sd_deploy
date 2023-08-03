@@ -1,11 +1,11 @@
 from PIL import Image
 import numpy as np
 
-from modules import scripts_postprocessing, shared
+from stabledeploy.modules import scripts_postprocessing, shared
 import gradio as gr
 
-from modules.ui_components import FormRow, ToolButton
-from modules.ui import switch_values_symbol
+from stabledeploy.modules.ui_components import FormRow, ToolButton
+from stabledeploy.modules.ui import switch_values_symbol
 
 upscale_cache = {}
 

@@ -7,9 +7,9 @@ import shlex
 import modules.scripts as scripts
 import gradio as gr
 
-from modules import sd_samplers
-from modules.processing import Processed, process_images
-from modules.shared import state
+from stabledeploy.modules import sd_samplers
+from stabledeploy.modules.processing import Processed, process_images
+from stabledeploy.modules.shared import state
 
 
 def process_string_tag(tag):

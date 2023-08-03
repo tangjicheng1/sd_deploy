@@ -1,10 +1,10 @@
 from PIL import Image
 import numpy as np
 
-from modules import scripts_postprocessing, gfpgan_model
+from stabledeploy.modules import scripts_postprocessing, gfpgan_model
 import gradio as gr
 
-from modules.ui_components import FormRow
+from stabledeploy.modules.ui_components import FormRow
 
 
 class ScriptPostprocessingGfpGan(scripts_postprocessing.ScriptPostprocessing):

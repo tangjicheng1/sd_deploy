@@ -1,4 +1,4 @@
-from modules import launch_utils
+from stabledeploy.modules import launch_utils
 
 
 args = launch_utils.args

@@ -7,9 +7,9 @@ import modules.scripts as scripts
 import gradio as gr
 from PIL import Image, ImageDraw
 
-from modules import images
-from modules.processing import Processed, process_images
-from modules.shared import opts, state
+from stabledeploy.modules import images
+from stabledeploy.modules.processing import Processed, process_images
+from stabledeploy.modules.shared import opts, state
 
 
 # this function is taken from https://github.com/parlance-zz/g-diffuser-bot

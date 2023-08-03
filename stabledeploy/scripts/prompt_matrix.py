@@ -3,9 +3,9 @@ import math
 import modules.scripts as scripts
 import gradio as gr
 
-from modules import images
-from modules.processing import process_images
-from modules.shared import opts, state
+from stabledeploy.modules import images
+from stabledeploy.modules.processing import process_images
+from stabledeploy.modules.shared import opts, state
 import modules.sd_samplers
 
 

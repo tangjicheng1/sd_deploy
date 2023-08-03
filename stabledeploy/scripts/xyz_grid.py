@@ -9,7 +9,7 @@ import numpy as np
 import gradio as gr
 import re
 
-from modules import images, sd_samplers, processing, sd_models, sd_vae, scripts, shared, ui_components
+from stabledeploy.modules import images, sd_samplers, processing, sd_models, sd_vae, scripts, shared, ui_components
 
 fill_values_symbol = "\U0001f4d2"  # 📒
 
