@@ -226,58 +226,6 @@ def list_files_with_name(filename):
     return res
 
 
-def load_scripts():
-    global current_basedir
-    scripts_data.clear()
-    postprocessing_scripts_data.clear()
-    script_callbacks.clear_callbacks()
-
-    scripts_list = list_scripts("scripts", ".py")
-
-    syspath = sys.path
-
-    def register_scripts_from_module(module):
-        for script_class in module.__dict__.values():
-            if type(script_class) != type:
-                continue
-
-            if issubclass(script_class, Script):
-                scripts_data.append(ScriptClassData(script_class, scriptfile.path, scriptfile.basedir, module))
-            elif issubclass(script_class, scripts_postprocessing.ScriptPostprocessing):
-                postprocessing_scripts_data.append(ScriptClassData(script_class, scriptfile.path, scriptfile.basedir, module))
-
-    def orderby(basedir):
-        # 1st webui, 2nd extensions-builtin, 3rd extensions
-        priority = {os.path.join(paths.script_path, "extensions-builtin"):1, paths.script_path:0}
-        for key in priority:
-            if basedir.startswith(key):
-                return priority[key]
-        return 9999
-
-    for scriptfile in sorted(scripts_list, key=lambda x: [orderby(x.basedir), x]):
-        try:
-            if scriptfile.basedir != paths.script_path:
-                sys.path = [scriptfile.basedir] + sys.path
-            current_basedir = scriptfile.basedir
-
-            script_module = script_loading.load_module(scriptfile.path)
-            register_scripts_from_module(script_module)
-
-        except Exception:
-            print(f"Error loading script: {scriptfile.filename}", file=sys.stderr)
-            print(traceback.format_exc(), file=sys.stderr)
-
-        finally:
-            sys.path = syspath
-            current_basedir = paths.script_path
-
-    global scripts_txt2img, scripts_img2img, scripts_postproc
-
-    scripts_txt2img = ScriptRunner()
-    scripts_img2img = ScriptRunner()
-    scripts_postproc = scripts_postprocessing.ScriptPostprocessingRunner()
-
-
 def wrap_call(func, filename, funcname, *args, default=None, **kwargs):
     try:
         res = func(*args, **kwargs)
@@ -538,6 +486,55 @@ scripts_img2img: ScriptRunner = None
 scripts_postproc: scripts_postprocessing.ScriptPostprocessingRunner = None
 scripts_current: ScriptRunner = None
 
+
+def load_scripts():
+    global current_basedir
+    scripts_data.clear()
+    postprocessing_scripts_data.clear()
+    script_callbacks.clear_callbacks()
+
+    scripts_list = list_scripts("scripts", ".py")
+
+    syspath = sys.path
+
+    def register_scripts_from_module(module):
+        for script_class in module.__dict__.values():
+            if type(script_class) != type:
+                continue
+
+            if issubclass(script_class, Script):
+                scripts_data.append(ScriptClassData(script_class, scriptfile.path, scriptfile.basedir, module))
+            elif issubclass(script_class, scripts_postprocessing.ScriptPostprocessing):
+                postprocessing_scripts_data.append(ScriptClassData(script_class, scriptfile.path, scriptfile.basedir, module))
+
+    def orderby(basedir):
+        # 1st webui, 2nd extensions-builtin, 3rd extensions
+        priority = {os.path.join(paths.script_path, "extensions-builtin"):1, paths.script_path:0}
+        for key in priority:
+            if basedir.startswith(key):
+                return priority[key]
+        return 9999
+
+    for scriptfile in sorted(scripts_list, key=lambda x: [orderby(x.basedir), x]):
+        try:
+            if scriptfile.basedir != paths.script_path:
+                sys.path = [scriptfile.basedir] + sys.path
+            current_basedir = scriptfile.basedir
+
+            script_module = script_loading.load_module(scriptfile.path)
+            register_scripts_from_module(script_module)
+
+        except Exception:
+            print(f"Error loading script: {scriptfile.filename}", file=sys.stderr)
+            print(traceback.format_exc(), file=sys.stderr)
+
+        finally:
+            sys.path = syspath
+            current_basedir = paths.script_path
+
+    stabledeploy.modules.scripts.scripts_txt2img = ScriptRunner()
+    stabledeploy.modules.scripts.scripts_img2img = ScriptRunner()
+    stabledeploy.modules.scripts.scripts_postproc = scripts_postprocessing.ScriptPostprocessingRunner()
 
 def reload_script_body_only():
     cache = {}

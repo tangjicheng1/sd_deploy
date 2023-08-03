@@ -20,7 +20,7 @@ import logging
 
 logging.getLogger("xformers").addFilter(lambda record: 'A matching Triton is not available' not in record.getMessage())
 
-from modules import sd_models, paths, timer, import_hook, errors  # noqa: F401
+from stabledeploy.modules import sd_models, paths, timer, import_hook, errors  # noqa: F401
 
 startup_timer = timer.Timer()
 
@@ -75,47 +75,6 @@ if shared.cmd_opts.server_name:
 else:
     server_name = "0.0.0.0" if shared.cmd_opts.listen else None
 
-
-def fix_asyncio_event_loop_policy():
-    """
-        The default `asyncio` event loop policy only automatically creates
-        event loops in the main threads. Other threads must create event
-        loops explicitly or `asyncio.get_event_loop` (and therefore
-        `.IOLoop.current`) will fail. Installing this policy allows event
-        loops to be created automatically on any thread, matching the
-        behavior of Tornado versions prior to 5.0 (or 5.0 on Python 2).
-    """
-
-    import asyncio
-
-    if sys.platform == "win32" and hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
-        # "Any thread" and "selector" should be orthogonal, but there's not a clean
-        # interface for composing policies so pick the right base.
-        _BasePolicy = asyncio.WindowsSelectorEventLoopPolicy  # type: ignore
-    else:
-        _BasePolicy = asyncio.DefaultEventLoopPolicy
-
-    class AnyThreadEventLoopPolicy(_BasePolicy):  # type: ignore
-        """Event loop policy that allows loop creation on any thread.
-        Usage::
-
-            asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
-        """
-
-        def get_event_loop(self) -> asyncio.AbstractEventLoop:
-            try:
-                return super().get_event_loop()
-            except (RuntimeError, AssertionError):
-                # This was an AssertionError in python 3.4.2 (which ships with debian jessie)
-                # and changed to a RuntimeError in 3.4.3.
-                # "There is no current event loop in thread %r"
-                loop = self.new_event_loop()
-                self.set_event_loop(loop)
-                return loop
-
-    asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
-
-
 def check_versions():
     if shared.cmd_opts.skip_version_check:
         return
@@ -163,23 +122,6 @@ def restore_config_state_file():
         startup_timer.record("restore extension config")
     elif config_state_file:
         print(f"!!! Config state backup not found: {config_state_file}")
-
-
-def validate_tls_options():
-    if not (shared.cmd_opts.tls_keyfile and shared.cmd_opts.tls_certfile):
-        return
-
-    try:
-        if not os.path.exists(shared.cmd_opts.tls_keyfile):
-            print("Invalid path to TLS keyfile given")
-        if not os.path.exists(shared.cmd_opts.tls_certfile):
-            print(f"Invalid path to TLS certfile: '{shared.cmd_opts.tls_certfile}'")
-    except TypeError:
-        shared.cmd_opts.tls_keyfile = shared.cmd_opts.tls_certfile = None
-        print("TLS setup invalid, running webui without TLS")
-    else:
-        print("Running with TLS")
-    startup_timer.record("TLS")
 
 
 def get_gradio_auth_creds() -> Iterable[tuple[str, ...]]:
@@ -231,8 +173,6 @@ def configure_opts_onchange():
 
 
 def initialize():
-    fix_asyncio_event_loop_policy()
-    validate_tls_options()
     configure_sigint_handler()
     check_versions()
     modelloader.cleanup_models()

@@ -1,3 +1,3 @@
-from stabledeploy.webui_wrapper import test_txt2img
+from stabledeploy import webui_wrapper
 
-test_txt2img()
+webui_wrapper.test_txt2img()
