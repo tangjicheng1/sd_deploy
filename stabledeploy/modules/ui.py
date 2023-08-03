@@ -429,6 +429,9 @@ def create_ui():
 
     generation_parameters_copypaste.reset()
 
+    from stabledeploy.modules import scripts
+    print("[tangjicheng] in ui.create_ui: ", scripts.scripts_txt2img)
+
     scripts.scripts_current = scripts.scripts_txt2img
     scripts.scripts_txt2img.initialize_scripts(is_img2img=False)
 
