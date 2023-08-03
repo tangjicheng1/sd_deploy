@@ -15,10 +15,10 @@ import ldm.modules.midas as midas
 
 from ldm.util import instantiate_from_config
 
-from modules import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config
-from modules.sd_hijack_inpainting import do_inpainting_hijack
-from modules.timer import Timer
-from modules.api import api_log
+from . import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config
+from .sd_hijack_inpainting import do_inpainting_hijack
+from .timer import Timer
+from .api import api_log
 import tomesd
 
 model_dir = "Stable-diffusion"
@@ -434,7 +434,7 @@ model_data = SdModelData()
 
 
 def load_model(checkpoint_info=None, already_loaded_state_dict=None):
-    from modules import lowvram, sd_hijack
+    from . import lowvram, sd_hijack
     checkpoint_info = checkpoint_info or select_checkpoint()
 
     if model_data.sd_model:
@@ -510,7 +510,7 @@ def load_model(checkpoint_info=None, already_loaded_state_dict=None):
 
 
 def reload_model_weights(sd_model=None, info=None):
-    from modules import lowvram, devices, sd_hijack
+    from . import lowvram, devices, sd_hijack
     checkpoint_info = info or select_checkpoint()
 
     if not sd_model:
@@ -566,7 +566,7 @@ def reload_model_weights(sd_model=None, info=None):
 
 
 def unload_model_weights(sd_model=None, info=None):
-    from modules import devices, sd_hijack
+    from . import devices, sd_hijack
     timer = Timer()
 
     if model_data.sd_model:
