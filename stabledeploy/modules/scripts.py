@@ -538,6 +538,7 @@ def load_scripts():
     scripts_postproc = scripts_postprocessing.ScriptPostprocessingRunner()
     from stabledeploy.modules import scripts
     print("[tangjicheng] in load_scripts:", scripts.scripts_txt2img)
+    print("[tangjicheng] in load_scripts 2 :", scripts_txt2img)
 
 def reload_script_body_only():
     cache = {}
