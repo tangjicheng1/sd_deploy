@@ -96,7 +96,6 @@ def save_files(js_data, images, do_make_zip, index):
 
 def create_output_panel(tabname, outdir):
     from . import shared
-    import .generation_parameters_copypaste as parameters_copypaste
 
     def open_folder(f):
         if not os.path.exists(f):
@@ -135,7 +134,7 @@ Requested path was: {f}
                     save = gr.Button('Save', elem_id=f'save_{tabname}')
                     save_zip = gr.Button('Zip', elem_id=f'save_zip_{tabname}')
 
-                buttons = parameters_copypaste.create_buttons(["img2img", "inpaint", "extras"])
+                buttons = generation_parameters_copypaste.create_buttons(["img2img", "inpaint", "extras"])
 
             open_folder_button.click(
                 fn=lambda: open_folder(shared.opts.outdir_samples or outdir),
@@ -206,7 +205,7 @@ Requested path was: {f}
                 paste_field_names = scripts.scripts_img2img.paste_field_names
 
             for paste_tabname, paste_button in buttons.items():
-                parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
+                generation_parameters_copypaste.register_paste_params_button(generation_parameters_copypaste.ParamBinding(
                     paste_button=paste_button, tabname=paste_tabname, source_tabname="txt2img" if tabname == "txt2img" else None, source_image_component=result_gallery,
                     paste_field_names=paste_field_names
                 ))
