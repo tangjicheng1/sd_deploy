@@ -1,7 +1,7 @@
 import json
 import os
 
-from modules import shared, ui_extra_networks
+from . import shared, ui_extra_networks
 
 
 class ExtraNetworksPageHypernetworks(ui_extra_networks.ExtraNetworksPage):

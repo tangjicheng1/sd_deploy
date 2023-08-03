@@ -1,6 +1,5 @@
 import gradio as gr
-from modules import scripts, shared, ui_common, postprocessing, call_queue
-import modules.generation_parameters_copypaste as parameters_copypaste
+from . import scripts, shared, ui_common, postprocessing, call_queue, generation_parameters_copypaste
 
 
 def create_ui():
@@ -49,7 +48,7 @@ def create_ui():
         ]
     )
 
-    parameters_copypaste.add_paste_fields("extras", extras_image, None)
+    generation_parameters_copypaste.add_paste_fields("extras", extras_image, None)
 
     extras_image.change(
         fn=scripts.scripts_postproc.image_changed,

@@ -11,17 +11,13 @@ import gradio.routes
 import gradio.utils
 import numpy as np
 from PIL import Image, PngImagePlugin  # noqa: F401
-from modules import call_queue
 
-from modules import sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae, extra_networks, ui_common, ui_postprocessing, progress, ui_loadsave
-from modules.ui_components import FormRow, FormGroup, ToolButton, FormHTML
-from modules.paths import script_path, data_path
+from . import gfpgan_model, codeformer_model, call_queue, sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae, extra_networks, ui_common, ui_postprocessing, progress, ui_loadsave
+from .ui_components import FormRow, FormGroup, ToolButton, FormHTML
+from .paths import script_path, data_path
+from .shared import opts, cmd_opts
 
-from modules.shared import opts, cmd_opts
-
-import modules.codeformer_model
 import modules.generation_parameters_copypaste as parameters_copypaste
-import modules.gfpgan_model
 import modules.hypernetworks.ui
 from modules import scripts
 from modules import shared

@@ -1,7 +1,7 @@
 import json
 import os
 
-from modules import ui_extra_networks, sd_hijack, shared
+from . import ui_extra_networks, sd_hijack, shared
 
 
 class ExtraNetworksPageTextualInversion(ui_extra_networks.ExtraNetworksPage):

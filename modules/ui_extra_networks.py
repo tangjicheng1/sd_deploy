@@ -2,13 +2,13 @@ import os.path
 import urllib.parse
 from pathlib import Path
 
-from modules import shared
-from modules.images import read_info_from_image, save_image_with_geninfo
+from . import shared
+from .images import read_info_from_image, save_image_with_geninfo
 import gradio as gr
 import json
 import html
 
-from modules.generation_parameters_copypaste import image_from_url_text
+from .generation_parameters_copypaste import image_from_url_text
 
 extra_pages = []
 allowed_dirs = set()
@@ -237,9 +237,9 @@ def initialize():
 
 
 def register_default_pages():
-    from modules.ui_extra_networks_textual_inversion import ExtraNetworksPageTextualInversion
-    from modules.ui_extra_networks_hypernets import ExtraNetworksPageHypernetworks
-    from modules.ui_extra_networks_checkpoints import ExtraNetworksPageCheckpoints
+    from .ui_extra_networks_textual_inversion import ExtraNetworksPageTextualInversion
+    from .ui_extra_networks_hypernets import ExtraNetworksPageHypernetworks
+    from .ui_extra_networks_checkpoints import ExtraNetworksPageCheckpoints
     register_page(ExtraNetworksPageTextualInversion())
     register_page(ExtraNetworksPageHypernetworks())
     register_page(ExtraNetworksPageCheckpoints())

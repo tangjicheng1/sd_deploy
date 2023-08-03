@@ -7,7 +7,7 @@ import gradio.components
 
 from PIL import PngImagePlugin
 
-from modules import shared
+from . import shared
 
 
 Savedfile = namedtuple("Savedfile", ["name"])

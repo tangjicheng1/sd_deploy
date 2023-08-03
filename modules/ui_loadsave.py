@@ -3,8 +3,8 @@ import os
 
 import gradio as gr
 
-from modules import errors
-from modules.ui_components import ToolButton
+from . import errors
+from .ui_components import ToolButton
 
 
 class UiLoadsave:

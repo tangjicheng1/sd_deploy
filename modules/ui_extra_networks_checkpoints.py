@@ -2,7 +2,7 @@ import html
 import json
 import os
 
-from modules import shared, ui_extra_networks, sd_models
+from . import shared, ui_extra_networks, sd_models
 
 
 class ExtraNetworksPageCheckpoints(ui_extra_networks.ExtraNetworksPage):
