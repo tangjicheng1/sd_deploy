@@ -9,11 +9,11 @@ import piexif
 import piexif.helper
 import gradio as gr
 
-from modules import scripts, script_callbacks, extensions, shared, ui, sd_hijack
-from modules.shared import opts
-from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
-from modules.call_queue import queue_lock
-import webui
+from stabledeploy.modules import scripts, script_callbacks, extensions, shared, ui, sd_hijack
+from stabledeploy.modules.shared import opts
+from stabledeploy.modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
+from stabledeploy.modules.call_queue import queue_lock
+from stabledeploy import webui
 
 
 def encode_pil_to_base64(image):
