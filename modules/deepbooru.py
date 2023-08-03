@@ -4,7 +4,7 @@ import re
 import torch
 import numpy as np
 
-from modules import modelloader, paths, deepbooru_model, devices, images, shared
+from . import modelloader, paths, deepbooru_model, devices, images, shared
 
 re_special = re.compile(r'([\\()])')
 

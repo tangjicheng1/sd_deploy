@@ -5,10 +5,10 @@ import torch
 from PIL import Image
 from basicsr.utils.download_util import load_file_from_url
 
-import modules.esrgan_model_arch as arch
-from modules import modelloader, images, devices
-from modules.upscaler import Upscaler, UpscalerData
-from modules.shared import opts
+from . import esrgan_model_arch as arch
+from . import modelloader, images, devices
+from .upscaler import Upscaler, UpscalerData
+from .shared import opts
 
 
 

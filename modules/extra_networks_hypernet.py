@@ -1,5 +1,5 @@
-from modules import extra_networks, shared
-from modules.hypernetworks import hypernetwork
+from . import extra_networks, shared
+from .hypernetworks import hypernetwork
 
 
 class ExtraNetworkHypernet(extra_networks.ExtraNetwork):

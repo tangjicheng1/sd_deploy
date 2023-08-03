@@ -1,10 +1,10 @@
 import sys
 import contextlib
 import torch
-from modules import errors
+from . import errors
 
 if sys.platform == "darwin":
-    from modules import mac_specific
+    from . import mac_specific
 
 
 def has_mps() -> bool:
@@ -22,7 +22,7 @@ def extract_device_id(args, name):
 
 
 def get_cuda_device_string():
-    from modules import shared
+    from . import shared
 
     if shared.cmd_opts.device_id is not None:
         return f"cuda:{shared.cmd_opts.device_id}"
@@ -45,7 +45,7 @@ def get_optimal_device():
 
 
 def get_device_for(task):
-    from modules import shared
+    from . import shared
 
     if task in shared.cmd_opts.use_cpu:
         return cpu
@@ -92,7 +92,7 @@ def cond_cast_float(input):
 
 
 def randn(seed, shape):
-    from modules.shared import opts
+    from .shared import opts
 
     torch.manual_seed(seed)
     if opts.randn_source == "CPU" or device.type == 'mps':
@@ -101,7 +101,7 @@ def randn(seed, shape):
 
 
 def randn_without_seed(shape):
-    from modules.shared import opts
+    from .shared import opts
 
     if opts.randn_source == "CPU" or device.type == 'mps':
         return torch.randn(shape, device=cpu).to(device)
@@ -109,7 +109,7 @@ def randn_without_seed(shape):
 
 
 def autocast(disable=False):
-    from modules import shared
+    from . import shared
 
     if disable:
         return contextlib.nullcontext()
@@ -129,7 +129,7 @@ class NansException(Exception):
 
 
 def test_for_nans(x, where):
-    from modules import shared
+    from . import shared
 
     if shared.cmd_opts.disable_nan_check:
         return

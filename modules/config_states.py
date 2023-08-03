@@ -13,8 +13,8 @@ from datetime import datetime
 from collections import OrderedDict
 import git
 
-from modules import shared, extensions
-from modules.paths_internal import script_path, config_states_dir
+from . import shared, extensions
+from .paths_internal import script_path, config_states_dir
 
 
 all_config_states = OrderedDict()
