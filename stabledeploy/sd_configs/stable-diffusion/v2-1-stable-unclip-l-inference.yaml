@@ -1,6 +1,6 @@
 model:
   base_learning_rate: 1.0e-04
-  target: ldm.models.diffusion.ddpm.ImageEmbeddingConditionedLatentDiffusion
+  target: stabledeploy.ldm.models.diffusion.ddpm.ImageEmbeddingConditionedLatentDiffusion
   params:
     embedding_dropout: 0.25
     parameterization: "v"
@@ -19,12 +19,12 @@ model:
     use_ema: False
 
     embedder_config:
-      target: ldm.modules.encoders.modules.ClipImageEmbedder
+      target: stabledeploy.ldm.modules.encoders.modules.ClipImageEmbedder
       params:
         model: "ViT-L/14"
 
     noise_aug_config:
-      target: ldm.modules.encoders.modules.CLIPEmbeddingNoiseAugmentation
+      target: stabledeploy.ldm.modules.encoders.modules.CLIPEmbeddingNoiseAugmentation
       params:
         clip_stats_path: "checkpoints/karlo_models/ViT-L-14_stats.th"
         timestep_dim: 768
@@ -33,7 +33,7 @@ model:
           beta_schedule: squaredcos_cap_v2
 
     unet_config:
-      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      target: stabledeploy.ldm.modules.diffusionmodules.openaimodel.UNetModel
       params:
         num_classes: "sequential"
         adm_in_channels: 1536
@@ -53,7 +53,7 @@ model:
         legacy: False
 
     first_stage_config:
-      target: ldm.models.autoencoder.AutoencoderKL
+      target: stabledeploy.ldm.models.autoencoder.AutoencoderKL
       params:
         embed_dim: 4
         monitor: val/rec_loss
@@ -77,7 +77,7 @@ model:
           target: torch.nn.Identity
 
     cond_stage_config:
-      target: ldm.modules.encoders.modules.FrozenOpenCLIPEmbedder
+      target: stabledeploy.ldm.modules.encoders.modules.FrozenOpenCLIPEmbedder
       params:
         freeze: True
         layer: "penultimate"

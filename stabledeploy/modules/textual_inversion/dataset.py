@@ -13,7 +13,7 @@ import tqdm
 from modules import devices, shared
 import re
 
-from ldm.modules.distributions.distributions import DiagonalGaussianDistribution
+from stabledeploy.ldm.modules.distributions.distributions import DiagonalGaussianDistribution
 
 re_numbers_at_start = re.compile(r"^[-\d]+\s*")
 

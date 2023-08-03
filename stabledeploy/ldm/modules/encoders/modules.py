@@ -6,7 +6,7 @@ from torch.utils.checkpoint import checkpoint
 from transformers import T5Tokenizer, T5EncoderModel, CLIPTokenizer, CLIPTextModel
 
 import open_clip
-from ldm.util import default, count_params, autocast
+from stabledeploy.ldm.util import default, count_params, autocast
 
 
 class AbstractEncoder(nn.Module):
@@ -313,8 +313,8 @@ class FrozenCLIPT5Encoder(AbstractEncoder):
         return [clip_z, t5_z]
 
 
-from ldm.modules.diffusionmodules.upscaling import ImageConcatWithNoiseAugmentation
-from ldm.modules.diffusionmodules.openaimodel import Timestep
+from stabledeploy.ldm.modules.diffusionmodules.upscaling import ImageConcatWithNoiseAugmentation
+from stabledeploy.ldm.modules.diffusionmodules.openaimodel import Timestep
 
 
 class CLIPEmbeddingNoiseAugmentation(ImageConcatWithNoiseAugmentation):

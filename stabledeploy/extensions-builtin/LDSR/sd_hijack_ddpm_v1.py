@@ -2,7 +2,7 @@
 # Original filename: ldm/models/diffusion/ddpm.py
 # The purpose to reinstate the old DDPM logic which works with VQ, whereas the V2 one doesn't
 # Some models such as LDSR require VQ to work correctly
-# The classes are suffixed with "V1" and added back to the "ldm.models.diffusion.ddpm" module
+# The classes are suffixed with "V1" and added back to the "stabledeploy.ldm.models.diffusion.ddpm" module
 
 import torch
 import torch.nn as nn
@@ -16,14 +16,14 @@ from tqdm import tqdm
 from torchvision.utils import make_grid
 from pytorch_lightning.utilities import rank_zero_only
 
-from ldm.util import log_txt_as_img, exists, default, ismap, isimage, mean_flat, count_params, instantiate_from_config
-from ldm.modules.ema import LitEma
-from ldm.modules.distributions.distributions import normal_kl, DiagonalGaussianDistribution
-from ldm.models.autoencoder import VQModelInterface, IdentityFirstStage, AutoencoderKL
-from ldm.modules.diffusionmodules.util import make_beta_schedule, extract_into_tensor, noise_like
-from ldm.models.diffusion.ddim import DDIMSampler
+from stabledeploy.ldm.util import log_txt_as_img, exists, default, ismap, isimage, mean_flat, count_params, instantiate_from_config
+from stabledeploy.ldm.modules.ema import LitEma
+from stabledeploy.ldm.modules.distributions.distributions import normal_kl, DiagonalGaussianDistribution
+from stabledeploy.ldm.models.autoencoder import VQModelInterface, IdentityFirstStage, AutoencoderKL
+from stabledeploy.ldm.modules.diffusionmodules.util import make_beta_schedule, extract_into_tensor, noise_like
+from stabledeploy.ldm.models.diffusion.ddim import DDIMSampler
 
-import ldm.models.diffusion.ddpm
+import stabledeploy.ldm.models.diffusion.ddpm
 
 __conditioning_keys__ = {'concat': 'c_concat',
                          'crossattn': 'c_crossattn',
@@ -1437,7 +1437,7 @@ class Layout2ImgDiffusionV1(LatentDiffusionV1):
         logs['bbox_image'] = cond_img
         return logs
 
-ldm.models.diffusion.ddpm.DDPMV1 = DDPMV1
-ldm.models.diffusion.ddpm.LatentDiffusionV1 = LatentDiffusionV1
-ldm.models.diffusion.ddpm.DiffusionWrapperV1 = DiffusionWrapperV1
-ldm.models.diffusion.ddpm.Layout2ImgDiffusionV1 = Layout2ImgDiffusionV1
+stabledeploy.ldm.models.diffusion.ddpm.DDPMV1 = DDPMV1
+stabledeploy.ldm.models.diffusion.ddpm.LatentDiffusionV1 = LatentDiffusionV1
+stabledeploy.ldm.models.diffusion.ddpm.DiffusionWrapperV1 = DiffusionWrapperV1
+stabledeploy.ldm.models.diffusion.ddpm.Layout2ImgDiffusionV1 = Layout2ImgDiffusionV1

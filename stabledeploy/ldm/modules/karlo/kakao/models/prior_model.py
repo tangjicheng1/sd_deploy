@@ -6,8 +6,8 @@
 import copy
 import torch
 
-from ldm.modules.karlo.kakao.modules import create_gaussian_diffusion
-from ldm.modules.karlo.kakao.modules.xf import PriorTransformer
+from stabledeploy.ldm.modules.karlo.kakao.modules import create_gaussian_diffusion
+from stabledeploy.ldm.modules.karlo.kakao.modules.xf import PriorTransformer
 
 
 class PriorDiffusionModel(torch.nn.Module):

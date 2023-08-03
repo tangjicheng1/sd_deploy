@@ -10,7 +10,7 @@ import modules.textual_inversion.dataset
 import torch
 import tqdm
 from einops import rearrange, repeat
-from ldm.util import default
+from stabledeploy.ldm.util import default
 from modules import devices, processing, sd_models, shared, sd_samplers, hashes, sd_hijack_checkpoint
 from modules.textual_inversion import textual_inversion, logging
 from modules.textual_inversion.learn_schedule import LearnRateScheduler

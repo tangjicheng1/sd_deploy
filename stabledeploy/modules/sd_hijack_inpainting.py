@@ -1,11 +1,11 @@
 import torch
 
-import ldm.models.diffusion.ddpm
-import ldm.models.diffusion.ddim
-import ldm.models.diffusion.plms
+import stabledeploy.ldm.models.diffusion.ddpm
+import stabledeploy.ldm.models.diffusion.ddim
+import stabledeploy.ldm.models.diffusion.plms
 
-from ldm.models.diffusion.ddim import noise_like
-from ldm.models.diffusion.sampling_util import norm_thresholding
+from stabledeploy.ldm.models.diffusion.ddim import noise_like
+from stabledeploy.ldm.models.diffusion.sampling_util import norm_thresholding
 
 
 @torch.no_grad()
@@ -94,4 +94,4 @@ def p_sample_plms(self, x, c, t, index, repeat_noise=False, use_original_steps=F
 def do_inpainting_hijack():
     # p_sample_plms is needed because PLMS can't work with dicts as conditionings
 
-    ldm.models.diffusion.plms.PLMSSampler.p_sample_plms = p_sample_plms
+    stabledeploy.ldm.models.diffusion.plms.PLMSSampler.p_sample_plms = p_sample_plms

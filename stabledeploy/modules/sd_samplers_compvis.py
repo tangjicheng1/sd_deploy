@@ -1,6 +1,6 @@
 import math
-import ldm.models.diffusion.ddim
-import ldm.models.diffusion.plms
+import stabledeploy.ldm.models.diffusion.ddim
+import stabledeploy.ldm.models.diffusion.plms
 
 import numpy as np
 import torch
@@ -11,8 +11,8 @@ from .models.diffusion.uni_pc.sampler import UniPCSampler
 
 
 samplers_data_compvis = [
-    sd_samplers_common.SamplerData('DDIM', lambda model: VanillaStableDiffusionSampler(ldm.models.diffusion.ddim.DDIMSampler, model), [], {"default_eta_is_0": True, "uses_ensd": True}),
-    sd_samplers_common.SamplerData('PLMS', lambda model: VanillaStableDiffusionSampler(ldm.models.diffusion.plms.PLMSSampler, model), [], {}),
+    sd_samplers_common.SamplerData('DDIM', lambda model: VanillaStableDiffusionSampler(stabledeploy.ldm.models.diffusion.ddim.DDIMSampler, model), [], {"default_eta_is_0": True, "uses_ensd": True}),
+    sd_samplers_common.SamplerData('PLMS', lambda model: VanillaStableDiffusionSampler(stabledeploy.ldm.models.diffusion.plms.PLMSSampler, model), [], {}),
     sd_samplers_common.SamplerData('UniPC', lambda model: VanillaStableDiffusionSampler(UniPCSampler, model), [], {}),
 ]
 

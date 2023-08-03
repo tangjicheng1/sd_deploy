@@ -6,8 +6,8 @@
 import copy
 import torch
 
-from ldm.modules.karlo.kakao.modules import create_gaussian_diffusion
-from ldm.modules.karlo.kakao.modules.unet import PLMImUNet
+from stabledeploy.ldm.modules.karlo.kakao.modules import create_gaussian_diffusion
+from stabledeploy.ldm.modules.karlo.kakao.modules.unet import PLMImUNet
 
 
 class Text2ImProgressiveModel(torch.nn.Module):

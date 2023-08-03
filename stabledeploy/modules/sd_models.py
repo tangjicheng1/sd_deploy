@@ -11,9 +11,9 @@ import safetensors.torch
 from omegaconf import OmegaConf
 from os import mkdir
 from urllib import request
-import ldm.modules.midas as midas
+import stabledeploy.ldm.modules.midas as midas
 
-from ldm.util import instantiate_from_config
+from stabledeploy.ldm.util import instantiate_from_config
 
 from . import paths, shared, modelloader, devices, script_callbacks, sd_vae, sd_disable_initialization, errors, hashes, sd_models_config
 from .sd_hijack_inpainting import do_inpainting_hijack
@@ -337,7 +337,7 @@ def load_model_weights(model, checkpoint_info: CheckpointInfo, state_dict, timer
 
 def enable_midas_autodownload():
     """
-    Gives the ldm.modules.midas.api.load_model function automatic downloading.
+    Gives the stabledeploy.ldm.modules.midas.api.load_model function automatic downloading.
 
     When the 512-depth-ema model, and other future models like it, is loaded,
     it calls midas.api.load_model to load the associated midas depth model.

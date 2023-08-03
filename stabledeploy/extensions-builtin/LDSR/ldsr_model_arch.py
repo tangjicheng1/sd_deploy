@@ -10,8 +10,8 @@ from einops import rearrange, repeat
 from omegaconf import OmegaConf
 import safetensors.torch
 
-from ldm.models.diffusion.ddim import DDIMSampler
-from ldm.util import instantiate_from_config, ismap
+from stabledeploy.ldm.models.diffusion.ddim import DDIMSampler
+from stabledeploy.ldm.util import instantiate_from_config, ismap
 from modules import shared, sd_hijack
 
 cached_ldsr_model: torch.nn.Module = None
@@ -34,7 +34,7 @@ class LDSR:
                 pl_sd = torch.load(self.modelPath, map_location="cpu")
             sd = pl_sd["state_dict"] if "state_dict" in pl_sd else pl_sd
             config = OmegaConf.load(self.yamlPath)
-            config.model.target = "ldm.models.diffusion.ddpm.LatentDiffusionV1"
+            config.model.target = "stabledeploy.ldm.models.diffusion.ddpm.LatentDiffusionV1"
             model: torch.nn.Module = instantiate_from_config(config.model)
             model.load_state_dict(sd, strict=False)
             model = model.to(shared.device)

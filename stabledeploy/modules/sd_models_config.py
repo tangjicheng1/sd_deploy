@@ -25,13 +25,13 @@ def is_using_v_parameterization_for_sd2(state_dict):
     Detects whether unet in state_dict is using v-parameterization. Returns True if it is. You're welcome.
     """
 
-    import ldm.modules.diffusionmodules.openaimodel
+    import stabledeploy.ldm.modules.diffusionmodules.openaimodel
     from . import devices
 
     device = devices.cpu
 
     with sd_disable_initialization.DisableInitialization():
-        unet = ldm.modules.diffusionmodules.openaimodel.UNetModel(
+        unet = stabledeploy.ldm.modules.diffusionmodules.openaimodel.UNetModel(
             use_checkpoint=True,
             use_fp16=False,
             image_size=32,

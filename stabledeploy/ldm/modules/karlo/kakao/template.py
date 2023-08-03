@@ -9,10 +9,10 @@ import torch
 
 from omegaconf import OmegaConf
 
-from ldm.modules.karlo.kakao.models.clip import CustomizedCLIP, CustomizedTokenizer
-from ldm.modules.karlo.kakao.models.prior_model import PriorDiffusionModel
-from ldm.modules.karlo.kakao.models.decoder_model import Text2ImProgressiveModel
-from ldm.modules.karlo.kakao.models.sr_64_256 import ImprovedSupRes64to256ProgressiveModel
+from stabledeploy.ldm.modules.karlo.kakao.models.clip import CustomizedCLIP, CustomizedTokenizer
+from stabledeploy.ldm.modules.karlo.kakao.models.prior_model import PriorDiffusionModel
+from stabledeploy.ldm.modules.karlo.kakao.models.decoder_model import Text2ImProgressiveModel
+from stabledeploy.ldm.modules.karlo.kakao.models.sr_64_256 import ImprovedSupRes64to256ProgressiveModel
 
 
 SAMPLING_CONF = {

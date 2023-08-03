@@ -1,7 +1,7 @@
 from torch.utils.checkpoint import checkpoint
 
-import ldm.modules.attention
-import ldm.modules.diffusionmodules.openaimodel
+import stabledeploy.ldm.modules.attention
+import stabledeploy.ldm.modules.diffusionmodules.openaimodel
 
 
 def BasicTransformerBlock_forward(self, x, context=None):
@@ -24,23 +24,23 @@ def add():
         return
 
     stored.extend([
-        ldm.modules.attention.BasicTransformerBlock.forward,
-        ldm.modules.diffusionmodules.openaimodel.ResBlock.forward,
-        ldm.modules.diffusionmodules.openaimodel.AttentionBlock.forward
+        stabledeploy.ldm.modules.attention.BasicTransformerBlock.forward,
+        stabledeploy.ldm.modules.diffusionmodules.openaimodel.ResBlock.forward,
+        stabledeploy.ldm.modules.diffusionmodules.openaimodel.AttentionBlock.forward
     ])
 
-    ldm.modules.attention.BasicTransformerBlock.forward = BasicTransformerBlock_forward
-    ldm.modules.diffusionmodules.openaimodel.ResBlock.forward = ResBlock_forward
-    ldm.modules.diffusionmodules.openaimodel.AttentionBlock.forward = AttentionBlock_forward
+    stabledeploy.ldm.modules.attention.BasicTransformerBlock.forward = BasicTransformerBlock_forward
+    stabledeploy.ldm.modules.diffusionmodules.openaimodel.ResBlock.forward = ResBlock_forward
+    stabledeploy.ldm.modules.diffusionmodules.openaimodel.AttentionBlock.forward = AttentionBlock_forward
 
 
 def remove():
     if len(stored) == 0:
         return
 
-    ldm.modules.attention.BasicTransformerBlock.forward = stored[0]
-    ldm.modules.diffusionmodules.openaimodel.ResBlock.forward = stored[1]
-    ldm.modules.diffusionmodules.openaimodel.AttentionBlock.forward = stored[2]
+    stabledeploy.ldm.modules.attention.BasicTransformerBlock.forward = stored[0]
+    stabledeploy.ldm.modules.diffusionmodules.openaimodel.ResBlock.forward = stored[1]
+    stabledeploy.ldm.modules.diffusionmodules.openaimodel.AttentionBlock.forward = stored[2]
 
     stored.clear()
 

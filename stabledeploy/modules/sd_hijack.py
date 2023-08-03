@@ -7,25 +7,25 @@ from . import devices, sd_hijack_optimizations, shared, script_callbacks, errors
 from .hypernetworks import hypernetwork
 from .shared import cmd_opts
 
-import ldm.modules.attention
-import ldm.modules.diffusionmodules.model
-import ldm.modules.diffusionmodules.openaimodel
-import ldm.models.diffusion.ddim
-import ldm.models.diffusion.plms
-import ldm.modules.encoders.modules
+import stabledeploy.ldm.modules.attention
+import stabledeploy.ldm.modules.diffusionmodules.model
+import stabledeploy.ldm.modules.diffusionmodules.openaimodel
+import stabledeploy.ldm.models.diffusion.ddim
+import stabledeploy.ldm.models.diffusion.plms
+import stabledeploy.ldm.modules.encoders.modules
 
-attention_CrossAttention_forward = ldm.modules.attention.CrossAttention.forward
-diffusionmodules_model_nonlinearity = ldm.modules.diffusionmodules.model.nonlinearity
-diffusionmodules_model_AttnBlock_forward = ldm.modules.diffusionmodules.model.AttnBlock.forward
+attention_CrossAttention_forward = stabledeploy.ldm.modules.attention.CrossAttention.forward
+diffusionmodules_model_nonlinearity = stabledeploy.ldm.modules.diffusionmodules.model.nonlinearity
+diffusionmodules_model_AttnBlock_forward = stabledeploy.ldm.modules.diffusionmodules.model.AttnBlock.forward
 
 # new memory efficient cross attention blocks do not support hypernets and we already
 # have memory efficient cross attention anyway, so this disables SD2.0's memory efficient cross attention
-ldm.modules.attention.MemoryEfficientCrossAttention = ldm.modules.attention.CrossAttention
-ldm.modules.attention.BasicTransformerBlock.ATTENTION_MODES["softmax-xformers"] = ldm.modules.attention.CrossAttention
+stabledeploy.ldm.modules.attention.MemoryEfficientCrossAttention = stabledeploy.ldm.modules.attention.CrossAttention
+stabledeploy.ldm.modules.attention.BasicTransformerBlock.ATTENTION_MODES["softmax-xformers"] = stabledeploy.ldm.modules.attention.CrossAttention
 
 # silence new console spam from SD2
-ldm.modules.attention.print = lambda *args: None
-ldm.modules.diffusionmodules.model.print = lambda *args: None
+stabledeploy.ldm.modules.attention.print = lambda *args: None
+stabledeploy.ldm.modules.diffusionmodules.model.print = lambda *args: None
 
 optimizers = []
 current_optimizer: sd_hijack_optimizations.SdOptimization = None
@@ -52,8 +52,8 @@ def apply_optimizations():
         current_optimizer = None
         return ''
 
-    ldm.modules.diffusionmodules.model.nonlinearity = silu
-    ldm.modules.diffusionmodules.openaimodel.th = sd_hijack_unet.th
+    stabledeploy.ldm.modules.diffusionmodules.model.nonlinearity = silu
+    stabledeploy.ldm.modules.diffusionmodules.openaimodel.th = sd_hijack_unet.th
 
     if current_optimizer is not None:
         current_optimizer.undo()
@@ -83,9 +83,9 @@ def apply_optimizations():
 
 
 def undo_optimizations():
-    ldm.modules.diffusionmodules.model.nonlinearity = diffusionmodules_model_nonlinearity
-    ldm.modules.attention.CrossAttention.forward = hypernetwork.attention_CrossAttention_forward
-    ldm.modules.diffusionmodules.model.AttnBlock.forward = diffusionmodules_model_AttnBlock_forward
+    stabledeploy.ldm.modules.diffusionmodules.model.nonlinearity = diffusionmodules_model_nonlinearity
+    stabledeploy.ldm.modules.attention.CrossAttention.forward = hypernetwork.attention_CrossAttention_forward
+    stabledeploy.ldm.modules.diffusionmodules.model.AttnBlock.forward = diffusionmodules_model_AttnBlock_forward
 
 
 def fix_checkpoint():
@@ -169,12 +169,12 @@ class StableDiffusionModelHijack:
             model_embeddings.token_embedding = EmbeddingsWithFixes(model_embeddings.word_embeddings, self)
             m.cond_stage_model = sd_hijack_xlmr.FrozenXLMREmbedderWithCustomWords(m.cond_stage_model, self)
 
-        elif type(m.cond_stage_model) == ldm.modules.encoders.modules.FrozenCLIPEmbedder:
+        elif type(m.cond_stage_model) == stabledeploy.ldm.modules.encoders.modules.FrozenCLIPEmbedder:
             model_embeddings = m.cond_stage_model.transformer.text_model.embeddings
             model_embeddings.token_embedding = EmbeddingsWithFixes(model_embeddings.token_embedding, self)
             m.cond_stage_model = sd_hijack_clip.FrozenCLIPEmbedderWithCustomWords(m.cond_stage_model, self)
 
-        elif type(m.cond_stage_model) == ldm.modules.encoders.modules.FrozenOpenCLIPEmbedder:
+        elif type(m.cond_stage_model) == stabledeploy.ldm.modules.encoders.modules.FrozenOpenCLIPEmbedder:
             m.cond_stage_model.model.token_embedding = EmbeddingsWithFixes(m.cond_stage_model.model.token_embedding, self)
             m.cond_stage_model = sd_hijack_open_clip.FrozenOpenCLIPEmbedderWithCustomWords(m.cond_stage_model, self)
 
@@ -292,5 +292,5 @@ def register_buffer(self, name, attr):
     setattr(self, name, attr)
 
 
-ldm.models.diffusion.ddim.DDIMSampler.register_buffer = register_buffer
-ldm.models.diffusion.plms.PLMSSampler.register_buffer = register_buffer
+stabledeploy.ldm.models.diffusion.ddim.DDIMSampler.register_buffer = register_buffer
+stabledeploy.ldm.models.diffusion.plms.PLMSSampler.register_buffer = register_buffer

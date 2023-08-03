@@ -16,8 +16,8 @@ from . import sd_vae, sd_models, styles, images, face_restoration, paths, shared
 from .shared import opts, cmd_opts, state
 
 import logging
-from ldm.data.util import AddMiDaS
-from ldm.models.diffusion.ddpm import LatentDepth2ImageDiffusion
+from stabledeploy.ldm.data.util import AddMiDaS
+from stabledeploy.ldm.models.diffusion.ddpm import LatentDepth2ImageDiffusion
 
 from einops import repeat, rearrange
 from blendmodes.blend import blendLayers, BlendType
