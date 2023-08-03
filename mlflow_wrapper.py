@@ -15,6 +15,7 @@ mlflow.set_experiment("/Users/tang.j@ctw.inc/sd0728")
 class StableDiffusion(mlflow.pyfunc.PythonModel):
   def load_context(self, context):
     sys.path.append("/model/code")
+    sys.path.append("/model/code/sd_deploy")
 
 
   def predict(self, context, input):
