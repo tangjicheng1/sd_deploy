@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import stabledeploy.modules
 
 ####################
 # RRDBNet Generator
@@ -421,9 +422,9 @@ def sequential(*args):
     for module in args:
         if isinstance(module, nn.Sequential):
             for submodule in module.children():
-                modules.append(submodule)
+                stabledeploy.modules.append(submodule)
         elif isinstance(module, nn.Module):
-            modules.append(module)
+            stabledeploy.modules.append(module)
     return nn.Sequential(*modules)
 
 

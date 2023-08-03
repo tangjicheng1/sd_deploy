@@ -1,4 +1,4 @@
-import modules.scripts as scripts
+import stabledeploy.modules.scripts as scripts
 import gradio as gr
 import ast
 import copy

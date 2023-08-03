@@ -1,12 +1,12 @@
 import math
 
-import modules.scripts as scripts
+import stabledeploy.modules.scripts as scripts
 import gradio as gr
 
 from stabledeploy.modules import images
 from stabledeploy.modules.processing import process_images
 from stabledeploy.modules.shared import opts, state
-import modules.sd_samplers
+import stabledeploy.modules.sd_samplers
 
 
 def draw_xy_grid(xs, ys, x_label, y_label, cell):
@@ -56,7 +56,7 @@ class Script(scripts.Script):
         return [put_at_start, different_seeds, prompt_type, variations_delimiter, margin_size]
 
     def run(self, p, put_at_start, different_seeds, prompt_type, variations_delimiter, margin_size):
-        modules.processing.fix_seed(p)
+        stabledeploy.modules.processing.fix_seed(p)
         # Raise error if promp type is not positive or negative
         if prompt_type not in ["positive", "negative"]:
             raise ValueError(f"Unknown prompt type {prompt_type}")

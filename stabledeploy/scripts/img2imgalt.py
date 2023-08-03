@@ -3,7 +3,7 @@ from collections import namedtuple
 import numpy as np
 from tqdm import trange
 
-import modules.scripts as scripts
+import stabledeploy.modules.scripts as scripts
 import gradio as gr
 
 from stabledeploy.modules import processing, shared, sd_samplers, sd_samplers_common

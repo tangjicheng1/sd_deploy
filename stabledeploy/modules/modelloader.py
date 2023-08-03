@@ -123,7 +123,7 @@ def load_upscalers():
     for file in os.listdir(modules_dir):
         if "_model.py" in file:
             model_name = file.replace("_model.py", "")
-            full_model = f"modules.{model_name}_model"
+            full_model = f"stabledeploy.modules.{model_name}_model"
             try:
                 importlib.import_module(full_model)
             except Exception:

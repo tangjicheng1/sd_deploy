@@ -6,7 +6,8 @@ import sys
 import traceback
 import inspect
 
-import modules.textual_inversion.dataset
+import stabledeploy.modules.textual_inversion.dataset
+import stabledeploy.modules.hypernetworks.hypernetwork
 import torch
 import tqdm
 from einops import rearrange, repeat
@@ -480,7 +481,7 @@ def create_hypernetwork(name, enable_sizes, overwrite_old, layer_structure=None,
     else:
         dropout_structure = [0] * len(layer_structure)
 
-    hypernet = modules.hypernetworks.hypernetwork.Hypernetwork(
+    hypernet = stabledeploy.modules.hypernetworks.hypernetwork.Hypernetwork(
         name=name,
         enable_sizes=[int(x) for x in enable_sizes],
         layer_structure=layer_structure,
@@ -553,7 +554,7 @@ def train_hypernetwork(id_task, hypernetwork_name, learn_rate, batch_size, gradi
 
     pin_memory = shared.opts.pin_memory
 
-    ds = modules.textual_inversion.dataset.PersonalizedBase(data_root=data_root, width=training_width, height=training_height, repeats=shared.opts.training_image_repeats_per_epoch, placeholder_token=hypernetwork_name, model=shared.sd_model, cond_model=shared.sd_model.cond_stage_model, device=devices.device, template_file=template_file, include_cond=True, batch_size=batch_size, gradient_step=gradient_step, shuffle_tags=shuffle_tags, tag_drop_out=tag_drop_out, latent_sampling_method=latent_sampling_method, varsize=varsize, use_weight=use_weight)
+    ds = stabledeploy.modules.textual_inversion.dataset.PersonalizedBase(data_root=data_root, width=training_width, height=training_height, repeats=shared.opts.training_image_repeats_per_epoch, placeholder_token=hypernetwork_name, model=shared.sd_model, cond_model=shared.sd_model.cond_stage_model, device=devices.device, template_file=template_file, include_cond=True, batch_size=batch_size, gradient_step=gradient_step, shuffle_tags=shuffle_tags, tag_drop_out=tag_drop_out, latent_sampling_method=latent_sampling_method, varsize=varsize, use_weight=use_weight)
 
     if shared.opts.save_training_settings_to_txt:
         saved_params = dict(
@@ -564,7 +565,7 @@ def train_hypernetwork(id_task, hypernetwork_name, learn_rate, batch_size, gradi
 
     latent_sampling_method = ds.latent_sampling_method
 
-    dl = modules.textual_inversion.dataset.PersonalizedDataLoader(ds, latent_sampling_method=latent_sampling_method, batch_size=ds.batch_size, pin_memory=pin_memory)
+    dl = stabledeploy.modules.textual_inversion.dataset.PersonalizedDataLoader(ds, latent_sampling_method=latent_sampling_method, batch_size=ds.batch_size, pin_memory=pin_memory)
 
     old_parallel_processing_allowed = shared.parallel_processing_allowed
 

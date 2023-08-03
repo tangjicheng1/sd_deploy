@@ -3,7 +3,7 @@ import math
 import numpy as np
 import skimage
 
-import modules.scripts as scripts
+import stabledeploy.modules.scripts as scripts
 import gradio as gr
 from PIL import Image, ImageDraw
 

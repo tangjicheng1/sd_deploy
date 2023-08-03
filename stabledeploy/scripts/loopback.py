@@ -1,7 +1,7 @@
 import math
 
 import gradio as gr
-import modules.scripts as scripts
+import stabledeploy.modules.scripts as scripts
 from stabledeploy.modules import deepbooru, images, processing, shared
 from stabledeploy.modules.processing import Processed
 from stabledeploy.modules.shared import opts, state

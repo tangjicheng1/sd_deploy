@@ -10,6 +10,7 @@ import gradio as gr
 import re
 
 from stabledeploy.modules import images, sd_samplers, processing, sd_models, sd_vae, scripts, shared, ui_components
+import stabledeploy.modules.processing
 
 fill_values_symbol = "\U0001f4d2"  # 📒
 
@@ -455,7 +456,7 @@ class Script(scripts.Script):
 
     def run(self, p, x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images, include_sub_grids, no_fixed_seeds, margin_size):
         if not no_fixed_seeds:
-            modules.processing.fix_seed(p)
+            stabledeploy.modules.processing.fix_seed(p)
 
         if not shared.opts.return_grid:
             p.batch_size = 1
