@@ -532,7 +532,7 @@ def load_scripts():
             sys.path = syspath
             current_basedir = paths.script_path
 
-    from stabledeploy.modules.scripts import scripts_txt2img, scripts_img2img, scripts_postproc
+    global scripts_txt2img, scripts_img2img, scripts_postproc
     scripts_txt2img = ScriptRunner()
     scripts_img2img = ScriptRunner()
     scripts_postproc = scripts_postprocessing.ScriptPostprocessingRunner()
