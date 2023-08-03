@@ -325,7 +325,7 @@ class ScriptRunner:
                 self.selectable_scripts.append(script)
 
     def setup_ui(self):
-        import api.models
+        from .api import models
 
         self.titles = [wrap_call(script.title, script.filename, "title") or f"{script.filename} [error]" for script in self.selectable_scripts]
 
@@ -347,7 +347,7 @@ class ScriptRunner:
             for control in controls:
                 control.custom_script_source = os.path.basename(script.filename)
 
-                arg_info = api.models.ScriptArg(label=control.label or "")
+                arg_info = models.ScriptArg(label=control.label or "")
 
                 for field in ("value", "minimum", "maximum", "step", "choices"):
                     v = getattr(control, field, None)
@@ -356,7 +356,7 @@ class ScriptRunner:
 
                 api_args.append(arg_info)
 
-            script.api_info = api.models.ScriptInfo(
+            script.api_info = models.ScriptInfo(
                 name=script.name,
                 is_img2img=script.is_img2img,
                 is_alwayson=script.alwayson,
