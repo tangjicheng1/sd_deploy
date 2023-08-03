@@ -12,7 +12,7 @@ import safetensors.torch
 
 from ldm.models.diffusion.ddim import DDIMSampler
 from ldm.util import instantiate_from_config, ismap
-from ...modules import shared, sd_hijack
+from modules import shared, sd_hijack
 
 cached_ldsr_model: torch.nn.Module = None
 
