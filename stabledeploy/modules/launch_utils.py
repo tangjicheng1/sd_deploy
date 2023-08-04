@@ -302,7 +302,8 @@ def prepare_environment():
         version_check(commit)
 
     if args.update_all_extensions:
-        git_pull_recursive(extensions_dir)
+        # git_pull_recursive(extensions_dir)
+        pass
 
     if "--exit" in sys.argv:
         print("Exiting because of --exit argument")

@@ -345,15 +345,17 @@ def install_extension_from_url(dirname, url, branch_name=None):
         shutil.rmtree(tmpdir, True)
         if not branch_name:
             # if no branch is specified, use the default branch
-            with git.Repo.clone_from(url, tmpdir, filter=['blob:none']) as repo:
-                repo.remote().fetch()
-                for submodule in repo.submodules:
-                    submodule.update()
+            # with git.Repo.clone_from(url, tmpdir, filter=['blob:none']) as repo:
+            #     repo.remote().fetch()
+            #     for submodule in repo.submodules:
+            #         submodule.update()
+            pass
         else:
-            with git.Repo.clone_from(url, tmpdir, filter=['blob:none'], branch=branch_name) as repo:
-                repo.remote().fetch()
-                for submodule in repo.submodules:
-                    submodule.update()
+            pass
+            # with git.Repo.clone_from(url, tmpdir, filter=['blob:none'], branch=branch_name) as repo:
+            #     repo.remote().fetch()
+            #     for submodule in repo.submodules:
+            #         submodule.update()
         try:
             os.rename(tmpdir, target_dir)
         except OSError as err:

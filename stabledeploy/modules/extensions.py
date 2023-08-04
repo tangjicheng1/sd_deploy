@@ -54,7 +54,8 @@ class Extension:
         repo = None
         try:
             if os.path.exists(os.path.join(self.path, ".git")):
-                repo = git.Repo(self.path)
+                # repo = git.Repo(self.path)
+                pass
         except Exception:
             print(f"Error reading github repository info from {self.path}:", file=sys.stderr)
             print(traceback.format_exc(), file=sys.stderr)
@@ -94,33 +95,33 @@ class Extension:
         return res
 
     def check_updates(self):
-        repo = git.Repo(self.path)
-        for fetch in repo.remote().fetch(dry_run=True):
-            if fetch.flags != fetch.HEAD_UPTODATE:
-                self.can_update = True
-                self.status = "new commits"
-                return
+        # repo = git.Repo(self.path)
+        # for fetch in repo.remote().fetch(dry_run=True):
+        #     if fetch.flags != fetch.HEAD_UPTODATE:
+        #         self.can_update = True
+        #         self.status = "new commits"
+        #         return
 
-        try:
-            origin = repo.rev_parse('origin')
-            if repo.head.commit != origin:
-                self.can_update = True
-                self.status = "behind HEAD"
-                return
-        except Exception:
-            self.can_update = False
-            self.status = "unknown (remote error)"
-            return
+        # try:
+        #     origin = repo.rev_parse('origin')
+        #     if repo.head.commit != origin:
+        #         self.can_update = True
+        #         self.status = "behind HEAD"
+        #         return
+        # except Exception:
+        #     self.can_update = False
+        #     self.status = "unknown (remote error)"
+        #     return
 
         self.can_update = False
         self.status = "latest"
 
     def fetch_and_reset_hard(self, commit='origin'):
-        repo = git.Repo(self.path)
-        # Fix: `error: Your local changes to the following files would be overwritten by merge`,
-        # because WSL2 Docker set 755 file permissions instead of 644, this results to the error.
-        repo.git.fetch(all=True)
-        repo.git.reset(commit, hard=True)
+        # repo = git.Repo(self.path)
+        # # Fix: `error: Your local changes to the following files would be overwritten by merge`,
+        # # because WSL2 Docker set 755 file permissions instead of 644, this results to the error.
+        # repo.git.fetch(all=True)
+        # repo.git.reset(commit, hard=True)
         self.have_info_from_repo = False
 
 

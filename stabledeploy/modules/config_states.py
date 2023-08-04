@@ -51,7 +51,8 @@ def get_webui_config():
 
     try:
         if os.path.exists(os.path.join(script_path, ".git")):
-            webui_repo = git.Repo(script_path)
+            # webui_repo = git.Repo(script_path)
+            pass
     except Exception:
         print(f"Error reading webui git info from {script_path}:", file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
@@ -132,15 +133,16 @@ def restore_webui_config(config):
 
     try:
         if os.path.exists(os.path.join(script_path, ".git")):
-            webui_repo = git.Repo(script_path)
+            # webui_repo = git.Repo(script_path)
+            pass
     except Exception:
         print(f"Error reading webui git info from {script_path}:", file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
         return
 
     try:
-        webui_repo.git.fetch(all=True)
-        webui_repo.git.reset(webui_commit_hash, hard=True)
+        # webui_repo.git.fetch(all=True)
+        # webui_repo.git.reset(webui_commit_hash, hard=True)
         print(f"* Restored webui to commit {webui_commit_hash}.")
     except Exception:
         print(f"Error restoring webui to commit {webui_commit_hash}:", file=sys.stderr)
