@@ -11,7 +11,7 @@ import tqdm
 
 from datetime import datetime
 from collections import OrderedDict
-import git
+# import git
 
 from . import shared, extensions
 from .paths_internal import script_path, config_states_dir

@@ -3,7 +3,7 @@ import sys
 import threading
 import traceback
 
-import git
+# import git
 
 from . import shared
 from .paths_internal import extensions_dir, extensions_builtin_dir, script_path  # noqa: F401

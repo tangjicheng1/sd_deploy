@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 import traceback
 
-import git
+# import git
 
 import gradio as gr
 import html
