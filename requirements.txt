@@ -24,7 +24,6 @@ facexlib
 gfpgan
 realesrgan
 gdown
-GitPython
 psutil
 inflection
 gradio==3.31.0
