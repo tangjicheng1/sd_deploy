@@ -22,9 +22,9 @@ script_loading.preload_extensions(extensions_dir, parser)
 script_loading.preload_extensions(extensions_builtin_dir, parser)
 
 if os.environ.get('IGNORE_CMD_ARGS_ERRORS', None) is None:
-    cmd_opts, unknown = parser.parse_known_args()
+    cmd_opts, unknown = parser.parse_known_args([])
 else:
-    cmd_opts, _ = parser.parse_known_args()
+    cmd_opts, _ = parser.parse_known_args([])
 
 
 restricted_opts = {

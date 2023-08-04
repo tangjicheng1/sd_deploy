@@ -10,7 +10,7 @@ from functools import lru_cache
 from . import cmd_args
 from .paths_internal import script_path, extensions_dir
 
-args, _ = cmd_args.parser.parse_known_args()
+args, _ = cmd_args.parser.parse_known_args([])
 
 python = sys.executable
 git = os.environ.get('GIT', "git")
